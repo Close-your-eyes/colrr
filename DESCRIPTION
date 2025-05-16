@@ -1,0 +1,25 @@
+Package: colrr
+Type: Package
+Title: Color related functions
+Version: 0.1.0
+Description: Custom color palettes and a wrapper around paletteer.
+License: AGPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Authors@R: 
+    person(given = "Christopher Mark",
+           family = "Skopnik",
+           role = c("aut", "cre"),
+           email = "vonskopnik@pm.me",
+           comment = c(ORCID = "0000-0002-6089-4769"))
+Imports: 
+    paletteer,
+    prismatic,
+    ggplot2,
+    ggtext,
+    igraph,
+    purrr,
+    dplyr,
+    rlang,
+    scales
