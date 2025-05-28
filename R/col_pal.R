@@ -80,8 +80,13 @@ col_pal <- function(name = NULL,
     if (nrow(pal_select) == 0) {
       stop("Palette not found.")
     } else if (nrow(pal_select) > 1) {
-      print(pal_select)
-      stop("Name is ambiguous. Please specify by command.")
+      # special case: prefer colorbrewer palette by default
+      if (nrow(pal_select) == 2 && sum(grepl("RColorBrewer", pal_select$package)) == 1) {
+        pal_select <- dplyr::filter(pal_select, package == "RColorBrewer")
+      } else {
+        print(pal_select)
+        stop("Name is ambiguous. Please specify by command.")
+      }
     }
 
     if (pal_select$type2 == "discrete") {
@@ -114,3 +119,5 @@ col_pal <- function(name = NULL,
 }
 
 if(base::getRversion() >= "2.15.1")  utils::globalVariables(c("package", "palette", "command"))
+
+col_pal("RdBu")
