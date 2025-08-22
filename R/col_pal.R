@@ -80,10 +80,12 @@ col_pal <- function(name = NULL,
     if (nrow(pal_select) == 0) {
       stop("Palette not found.")
     } else if (nrow(pal_select) > 1) {
-      # special case: prefer colorbrewer palette by default
+      # special cases: prefer colorbrewer or viridis pkg by default
       if (nrow(pal_select) == 2 && sum(grepl("RColorBrewer", pal_select$package)) == 1) {
         pal_select <- dplyr::filter(pal_select, package == "RColorBrewer")
-      } else {
+      } else if (nrow(pal_select) > 1 && sum(grepl("viridis", pal_select$package)) == 1) {
+        pal_select <- dplyr::filter(pal_select, package == "viridis")
+      } else  {
         print(pal_select)
         stop("Name is ambiguous. Please specify by command.")
       }
@@ -95,7 +97,7 @@ col_pal <- function(name = NULL,
         n <- pal_select$length
       }
       if (n > pal_select$length) {
-        message("n = ", n, " larger than number of discrete color in palette (", pal_select$length, "). Going to interpolate to provide ", n, " colors.")
+        #message("n = ", n, " larger than number of discrete color in palette (", pal_select$length, "). Going to interpolate to provide ", n, " colors.")
         type <- "continuous"
       }
       pal_return <- paletteer::paletteer_d(pal_select$command, n = n, type = type, direction = direction)
@@ -114,10 +116,12 @@ col_pal <- function(name = NULL,
     pal_return <- prismatic::color(names(ratios))
   }
 
+  if (length(pal_return) > 200) {
+    invisible(pal_return)
+  } else {
+    return(pal_return)
+  }
 
-  return(pal_return)
 }
 
 if(base::getRversion() >= "2.15.1")  utils::globalVariables(c("package", "palette", "command"))
-
-col_pal("RdBu")

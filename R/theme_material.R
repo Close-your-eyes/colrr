@@ -1,5 +1,7 @@
 #' ggplot2 theme with style of Rstudios color palette 'Material'
 #'
+#' Geoms need to be turned to white (or bright) coloring.
+#'
 #' @param base_size base font size, given in pts.
 #' @param text_color color of various text elements
 #' @param bg_color background color, not intended to be changed dramatically
@@ -22,14 +24,15 @@
 #' gplot + colrr::theme_material(style = "prismy")
 #' gplot + colrr::theme_material(text_color = "hotpink", style = "base")
 
-theme_material <- function(base_size = 14,
+theme_material <- function(base_size = 12,
                            text_color = "white",
                            bg_color = "#273238",
                            bg_color2 = "#4F5C69",
-                           text_fun = ggtext::element_markdown,
+                           text_fun = ggtext::element_text,
                            style = c("prism", "prismy", "prismx", "base"),
                            white = F,
-                           legend_tight = F) {
+                           legend_tight = F,
+                           ...) {
 
   style <- rlang::arg_match(style)
   if (white) {
@@ -46,8 +49,8 @@ theme_material <- function(base_size = 14,
   thistheme <- ggplot2::theme_grey(base_size = base_size) +
     ggplot2::theme(
       # Text elements
-      text = ggplot2::element_text(color = text_color),
-      plot.title = text_fun(color = text_color, size = base_size * 1.2, face = "bold"),
+      text = ggplot2::element_text(color = text_color, ...),
+      plot.title = text_fun(color = text_color), # size = base_size * 1.2, face = "bold"
       plot.subtitle = text_fun(color = text_color, size = base_size),
       plot.caption = text_fun(color = text_color),
       plot.tag = text_fun(color = text_color),

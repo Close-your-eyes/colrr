@@ -12,7 +12,8 @@ theme_material(
   text_fun = ggtext::element_markdown,
   style = c("prism", "prismy", "prismx", "base"),
   white = F,
-  legend_tight = F
+  legend_tight = F,
+  ...
 )
 }
 \arguments{
@@ -37,7 +38,7 @@ ggtext::element_markdown}
 ggplot2 theme
 }
 \description{
-ggplot2 theme with style of Rstudios color palette 'Material'
+Geoms need to be turned to white (or bright) coloring.
 }
 \examples{
 gplot <- ggplot2::ggplot(data.frame(x = rnorm(100), y = rnorm(100), class = sample(letters[1:10], 100, T)), ggplot2::aes(x,y)) +
