@@ -5,11 +5,11 @@
 \title{ggplot2 theme with style of Rstudios color palette 'Material'}
 \usage{
 theme_material(
-  base_size = 14,
+  base_size = 12,
   text_color = "white",
   bg_color = "#273238",
   bg_color2 = "#4F5C69",
-  text_fun = ggtext::element_markdown,
+  text_fun = ggplot2::element_text,
   style = c("prism", "prismy", "prismx", "base"),
   white = F,
   legend_tight = F,
