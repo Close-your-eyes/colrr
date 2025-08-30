@@ -4,14 +4,20 @@
 \alias{make_col_pal}
 \title{Algorithm to adjust color palette to factor levels which are to be colored}
 \usage{
-make_col_pal(col_vec, fct_lvls, col_pal_args = list(), adjust_to_fct_lvls = F)
+make_col_pal(
+  col_vec,
+  fct_lvls = NULL,
+  col_pal_args = list(),
+  adjust_to_fct_lvls = F
+)
 }
 \arguments{
 \item{col_vec}{named or unnamed, complete or incomplete vector of colors;
 names should correspond to fct_lvls, can be an R color name, a hex color
 starting with '#' or a vector of these}
 
-\item{fct_lvls}{factor levels to color, can be a character}
+\item{fct_lvls}{factor levels to color, can be a character; NULL for
+continuous scale w/o factor levels to color}
 
 \item{col_pal_args}{arguments to colrr::col_pal but not n}
 

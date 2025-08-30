@@ -6,9 +6,12 @@
 #' @param col_vec named or unnamed, complete or incomplete vector of colors;
 #' names should correspond to fct_lvls, can be an R color name, a hex color
 #' starting with '#' or a vector of these
-#' @param fct_lvls factor levels to color, can be a character
+#' @param fct_lvls factor levels to color, can be a character; NULL for
+#' continuous scale w/o factor levels to color
 #' @param col_pal_args arguments to colrr::col_pal but not n
 #' @param adjust_to_fct_lvls adjust missing or wrong names of col_pal?
+#' @param na_color
+#' @param missing_fct_to_na
 #'
 #' @returns named color vector
 #' @export
@@ -55,19 +58,18 @@
 #' # ggplot2::scale_color_manual(values = col.pal,
 #' #                             na.value = col_na)
 make_col_pal <- function(col_vec,
-                         fct_lvls,
+                         fct_lvls = NULL,
                          col_pal_args = list(),
-                         adjust_to_fct_lvls = F) {
+                         adjust_to_fct_lvls = F,
+                         na_color = "grey50",
+                         missing_fct_to_na = T) {
 
   # with adjust_to_fct_lvls = F and later
   # ggplot2::scale_color_manual(values = col.pal,
   #                             na.value = col_na)
   # highlighting is easily possible
 
-  if (missing(fct_lvls)) {
-    stop("fct_lvls missing.")
-  }
-  if (anyDuplicated(as.character(fct_lvls))) {
+  if (!is.null(fct_lvls) && anyDuplicated(as.character(fct_lvls))) {
     message("make_col_pal: duplicate fct_lvls. they are made unique.")
   }
   fct_lvls <- unique(fct_lvls) # as.character? what about numeric? what about factor?
@@ -77,11 +79,17 @@ make_col_pal <- function(col_vec,
     col_pal <- col_vec
   } else if (length(col_vec) == 1) {
     # col_vec is palette name from colrr::col_pal
-    col_pal <- do.call(what = colrr::col_pal, args = c(list(n = length(fct_lvls)), col_pal_args))
+    col_pal <- do.call(what = colrr::col_pal, args = c(list(name = col_vec, n = length(fct_lvls)), col_pal_args))
   } else {
     # col_vec is a vector of colors already
     # could go with if clause but anyway
     col_pal <- col_vec
+  }
+
+  if (is.null(fct_lvls)) {
+    # continuous scale: no factor levels
+    # early exit
+    return(col_pal)
   }
 
   col_pal <- stats::setNames(as.character(col_pal), names(col_pal)) # keep all "" names
@@ -141,14 +149,16 @@ make_col_pal <- function(col_vec,
   } else {
 
     # add NA for missing colors - should this be optional?
-    if (length(col_pal) < length(fct_lvls)) {
-      nmiss <- length(fct_lvls) - length(col_pal)
-      col_pal <- c(col_pal, stats::setNames(rep(NA, nmiss), nm = fct_lvls[which(!fct_lvls %in% names(col_pal))]))
+    if (missing_fct_to_na) {
+      if (length(col_pal) < length(fct_lvls)) {
+        nmiss <- length(fct_lvls) - length(col_pal)
+        col_pal <- c(col_pal, stats::setNames(rep(NA, nmiss), nm = fct_lvls[which(!fct_lvls %in% names(col_pal))]))
+      }
     }
   }
 
-  # adjust order
-  col_pal <- col_pal[fct_lvls]
-
+  # adjust order - no
+  #col_pal <- col_pal[fct_lvls]
+  col_pal[which(is.na(col_pal))] <- na_color
   return(col_pal)
 }

@@ -41,7 +41,7 @@ col_pal <- function(name = NULL,
   direction <- as.numeric(match.arg(as.character(direction), choices = c("1","-1")))
 
   if (name %in% c("ggplot", "ggplot2", "hue", "hue_pal", "huepal")) {
-    if (is.null(n)) {
+    if (is.null(n) || n == 0) {
       n <- 100
     }
     pal_return <- prismatic::color(scales::hue_pal()(n))
@@ -93,7 +93,7 @@ col_pal <- function(name = NULL,
 
     if (pal_select$type2 == "discrete") {
       type <- "discrete"
-      if (is.null(n)) {
+      if (is.null(n) || n == 0) {
         n <- pal_select$length
       }
       if (n > pal_select$length) {
@@ -103,7 +103,7 @@ col_pal <- function(name = NULL,
       pal_return <- paletteer::paletteer_d(pal_select$command, n = n, type = type, direction = direction)
 
     } else if (pal_select$type2 == "continuous") {
-      if (is.null(n)) {
+      if (is.null(n) || n == 0) {
         n <- 100
       }
       pal_return <- paletteer::paletteer_c(pal_select$command, n = n, direction = direction)
