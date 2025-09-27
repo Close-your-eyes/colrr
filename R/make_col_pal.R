@@ -73,6 +73,9 @@ make_col_pal <- function(col_vec,
     message("make_col_pal: duplicate fct_lvls. they are made unique.")
   }
   fct_lvls <- unique(fct_lvls) # as.character? what about numeric? what about factor?
+  if (is.factor(fct_lvls)) {
+    fct_lvls <- levels(fct_lvls)
+  }
 
   if (length(col_vec) == 1 && (col_vec %in% grDevices::colors() || grepl("^#", col_vec))) {
     # col_vec is r color name or hex color
