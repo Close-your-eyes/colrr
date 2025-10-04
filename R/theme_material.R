@@ -11,6 +11,7 @@
 #' @param style appearance of axes and grid
 #' @param white use a light color scale with white bg
 #' @param legend_tight legend more compact and closer to plot panel
+#' @param ... arguments to text = ggplot2::element_text
 #'
 #' @return ggplot2 theme
 #' @export

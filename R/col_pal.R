@@ -28,9 +28,9 @@ col_pal <- function(name = NULL,
   }
 
   paletteers <-
-    dplyr::bind_rows(paletteer::palettes_c_names |> dplyr::mutate(type2 = "continuous"),
-                     paletteer::palettes_d_names |> dplyr::mutate(type2 = "discrete")) |>
-    dplyr::mutate(command = paste0(package, "::", palette))
+    dplyr::bind_rows(dplyr::mutate(paletteer::palettes_c_names, type2 = "continuous"),
+                     dplyr::mutate(paletteer::palettes_d_names, type2 = "discrete"))
+  paletteers <- dplyr::mutate(paletteers, command = paste0(package, "::", palette))
 
   if (is.null(name)) {
     message("Select one palette by palette or command. Additional ones are 'custom', 'ggplot', 'hue', 'material'.")
@@ -51,8 +51,8 @@ col_pal <- function(name = NULL,
   } else if (name == "custom") {
     pal_return <- prismatic::color(c("grey65", "darkgoldenrod1", "cornflowerblue", "forestgreen", "tomato2", "mediumpurple1", "turquoise3", "lightgreen", "navy", "plum1",
                                      "red4", "khaki1", "tan4", "cadetblue1", "olivedrab3", "darkorange2", "burlywood2", "violetred3", "aquamarine3",
-                                     "grey30", "lavender", "yellow", "grey10", "pink3", "turquoise4", "darkkhaki", "magenta", "blue", "green", "blueviolet", "red",
-                                     "darkolivegreen", "orchid1", "springgreen", "dodgerblue4", "deepskyblue", "palevioletred4", "gold4", "maroon1", "lightyellow", "greenyellow", "purple4"))
+                                     "grey30", "lavender", "blueviolet", "grey10", "pink3", "turquoise4", "darkkhaki", "magenta", "blue", "green", "red",
+                                     "darkolivegreen", "orchid1", "springgreen", "dodgerblue4", "deepskyblue", "palevioletred4", "gold4", "maroon1", "lightyellow", "greenyellow", "purple4", "yellow"))
     if (!is.null(n)) {
       pal_return <- pal_return[1:n]
     }
@@ -71,56 +71,54 @@ col_pal <- function(name = NULL,
       pal_return <- rev(pal_return)
     }
   } else {
-    if (grepl("::", name)) {
-      pal_select <- paletteers |> dplyr::filter(tolower(command) == tolower(name))
-    } else {
-      pal_select <- paletteers |> dplyr::filter(tolower(palette) == tolower(name))
-    }
+    pal_select <- ifelse(grepl("::", name),
+                         list(dplyr::filter(paletteers, tolower(command) == tolower(name))),
+                         list(dplyr::filter(paletteers, tolower(palette) == tolower(name))))[[1]]
 
-    if (nrow(pal_select) == 0) {
-      stop("Palette not found.")
-    } else if (nrow(pal_select) > 1) {
-      # special cases: prefer colorbrewer or viridis pkg by default
-      if (nrow(pal_select) == 2 && sum(grepl("RColorBrewer", pal_select$package)) == 1) {
-        pal_select <- dplyr::filter(pal_select, package == "RColorBrewer")
-      } else if (nrow(pal_select) > 1 && sum(grepl("viridis", pal_select$package)) == 1) {
-        pal_select <- dplyr::filter(pal_select, package == "viridis")
-      } else  {
-        print(pal_select)
-        stop("Name is ambiguous. Please specify by command.")
-      }
-    }
-
-    if (pal_select$type2 == "discrete") {
-      type <- "discrete"
-      if (is.null(n) || n == 0) {
-        n <- pal_select$length
-      }
-      if (n > pal_select$length) {
-        #message("n = ", n, " larger than number of discrete color in palette (", pal_select$length, "). Going to interpolate to provide ", n, " colors.")
-        type <- "continuous"
-      }
-      pal_return <- paletteer::paletteer_d(pal_select$command, n = n, type = type, direction = direction)
-
-    } else if (pal_select$type2 == "continuous") {
-      if (is.null(n) || n == 0) {
-        n <- 100
-      }
-      pal_return <- paletteer::paletteer_c(pal_select$command, n = n, direction = direction)
+  if (nrow(pal_select) == 0) {
+    stop("Palette not found.")
+  } else if (nrow(pal_select) > 1) {
+    # special cases: prefer colorbrewer or viridis pkg by default
+    if (nrow(pal_select) == 2 && sum(grepl("RColorBrewer", pal_select$package)) == 1) {
+      pal_select <- dplyr::filter(pal_select, package == "RColorBrewer")
+    } else if (nrow(pal_select) > 1 && sum(grepl("viridis", pal_select$package)) == 1) {
+      pal_select <- dplyr::filter(pal_select, package == "viridis")
+    } else  {
+      print(pal_select)
+      stop("Name is ambiguous. Please specify by command.")
     }
   }
 
-  if (contrast_filter) {
-    ratios <- purrr::map_dbl(stats::setNames(pal_return, pal_return), contrast_ratio, color2 = bg_color)
-    ratios <- ratios[which(ratios > contrast_ratio_min)]
-    pal_return <- prismatic::color(names(ratios))
-  }
+  if (pal_select$type2 == "discrete") {
+    type <- "discrete"
+    if (is.null(n) || n == 0) {
+      n <- pal_select$length
+    }
+    if (n > pal_select$length) {
+      #message("n = ", n, " larger than number of discrete color in palette (", pal_select$length, "). Going to interpolate to provide ", n, " colors.")
+      type <- "continuous"
+    }
+    pal_return <- paletteer::paletteer_d(pal_select$command, n = n, type = type, direction = direction)
 
-  if (length(pal_return) > 200) {
-    invisible(pal_return)
-  } else {
-    return(pal_return)
+  } else if (pal_select$type2 == "continuous") {
+    if (is.null(n) || n == 0) {
+      n <- 100
+    }
+    pal_return <- paletteer::paletteer_c(pal_select$command, n = n, direction = direction)
   }
+}
+
+if (contrast_filter) {
+  ratios <- purrr::map_dbl(stats::setNames(pal_return, pal_return), contrast_ratio, color2 = bg_color)
+  ratios <- ratios[which(ratios > contrast_ratio_min)]
+  pal_return <- prismatic::color(names(ratios))
+}
+
+if (length(pal_return) > 200) {
+  invisible(pal_return)
+} else {
+  return(pal_return)
+}
 
 }
 

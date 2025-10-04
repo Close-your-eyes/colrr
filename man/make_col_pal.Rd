@@ -8,7 +8,9 @@ make_col_pal(
   col_vec,
   fct_lvls = NULL,
   col_pal_args = list(),
-  adjust_to_fct_lvls = F
+  adjust_to_fct_lvls = F,
+  na_color = "grey50",
+  missing_fct_to_na = T
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ continuous scale w/o factor levels to color}
 \item{col_pal_args}{arguments to colrr::col_pal but not n}
 
 \item{adjust_to_fct_lvls}{adjust missing or wrong names of col_pal?}
+
+\item{na_color}{color for NA}
+
+\item{missing_fct_to_na}{add NA for missing colors?}
 }
 \value{
 named color vector

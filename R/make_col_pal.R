@@ -10,8 +10,8 @@
 #' continuous scale w/o factor levels to color
 #' @param col_pal_args arguments to colrr::col_pal but not n
 #' @param adjust_to_fct_lvls adjust missing or wrong names of col_pal?
-#' @param na_color
-#' @param missing_fct_to_na
+#' @param na_color color for NA
+#' @param missing_fct_to_na add NA for missing colors?
 #'
 #' @returns named color vector
 #' @export
@@ -82,7 +82,7 @@ make_col_pal <- function(col_vec,
     col_pal <- col_vec
   } else if (length(col_vec) == 1) {
     # col_vec is palette name from colrr::col_pal
-    col_pal <- do.call(what = colrr::col_pal, args = c(list(name = col_vec, n = length(fct_lvls)), col_pal_args))
+    col_pal <- do.call(what = col_pal, args = c(list(name = col_vec, n = length(fct_lvls)), col_pal_args))
   } else {
     # col_vec is a vector of colors already
     # could go with if clause but anyway
