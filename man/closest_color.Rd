@@ -4,10 +4,12 @@
 \alias{closest_color}
 \title{Find most similar built-in R color}
 \usage{
-closest_color(hex, print = T)
+closest_color(hex, n = 1, print = T)
 }
 \arguments{
 \item{hex}{hex color code}
+
+\item{n}{top n closest colors}
 
 \item{print}{do print both colors side-by-side?}
 }

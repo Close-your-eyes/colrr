@@ -54,6 +54,9 @@ col_pal <- function(name = NULL,
                                      "grey30", "lavender", "blueviolet", "grey10", "pink3", "turquoise4", "darkkhaki", "magenta", "blue", "green", "red",
                                      "darkolivegreen", "orchid1", "springgreen", "dodgerblue4", "deepskyblue", "palevioletred4", "gold4", "maroon1", "lightyellow", "greenyellow", "purple4", "yellow"))
     if (!is.null(n)) {
+      if (n > length(pal_return)) {
+        pal_return <- prismatic::color(scales::hue_pal()(n))
+      }
       pal_return <- pal_return[1:n]
     }
     if (direction == -1) {
@@ -65,6 +68,9 @@ col_pal <- function(name = NULL,
                                      "#5787DA", "#25B876", "#5E3582", "#93C5DE", "#B7A7C5", "#2E90B0", "#C5C8C6", "#50C186")) # "#34312F"
 
     if (!is.null(n)) {
+      if (n > length(pal_return)) {
+        pal_return <- prismatic::color(scales::hue_pal()(n))
+      }
       pal_return <- pal_return[1:n]
     }
     if (direction == -1) {
@@ -98,6 +104,7 @@ col_pal <- function(name = NULL,
       #message("n = ", n, " larger than number of discrete color in palette (", pal_select$length, "). Going to interpolate to provide ", n, " colors.")
       type <- "continuous"
     }
+    # what if n>pal_select$length - fall back to hue pal?
     pal_return <- paletteer::paletteer_d(pal_select$command, n = n, type = type, direction = direction)
 
   } else if (pal_select$type2 == "continuous") {
@@ -109,7 +116,8 @@ col_pal <- function(name = NULL,
 }
 
 if (contrast_filter) {
-  ratios <- purrr::map_dbl(stats::setNames(pal_return, pal_return), contrast_ratio, color2 = bg_color)
+
+  ratios <- purrr::map_dbl(stats::setNames(pal_return, pal_return), contrast_ratio, hex2 = bg_color)
   ratios <- ratios[which(ratios > contrast_ratio_min)]
   pal_return <- prismatic::color(names(ratios))
 }
