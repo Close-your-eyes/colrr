@@ -7,7 +7,7 @@
 #' @param n number of colors to return; may not work for every palette
 #' @param direction reverse palette with -1
 #' @param contrast_filter remove colors if contrast to bg_color is below contrast_ratio_min.
-#' @param contrast_ratio_min minimum ration
+#' @param contrast_ratio_min minimum ratio; larger value for stricter difference
 #' @param bg_color background hex color or r color name
 #'
 #' @return a color palette as character vector
@@ -52,7 +52,8 @@ col_pal <- function(name = NULL,
     pal_return <- prismatic::color(c("grey65", "darkgoldenrod1", "cornflowerblue", "forestgreen", "tomato2", "mediumpurple1", "turquoise3", "lightgreen", "navy", "plum1",
                                      "red4", "khaki1", "tan4", "cadetblue1", "olivedrab3", "darkorange2", "burlywood2", "violetred3", "aquamarine3",
                                      "grey30", "lavender", "blueviolet", "grey10", "pink3", "turquoise4", "darkkhaki", "magenta", "blue", "green", "red",
-                                     "darkolivegreen", "orchid1", "springgreen", "dodgerblue4", "deepskyblue", "palevioletred4", "gold4", "maroon1", "lightyellow", "greenyellow", "purple4", "yellow"))
+                                     "darkolivegreen", "orchid1", "springgreen", "dodgerblue4", "deepskyblue", "palevioletred4", "gold4", "maroon1",
+                                     "lightyellow", "greenyellow", "purple4", "yellow"))
     if (!is.null(n)) {
       if (n > length(pal_return)) {
         pal_return <- prismatic::color(scales::hue_pal()(n))

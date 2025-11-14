@@ -94,7 +94,10 @@ theme_material <- function(base_size = 12,
         legend.key.spacing.y = ggplot2::unit(2, "pt"),
         legend.key.spacing.x = ggplot2::unit(2, "pt"),
         # negative left: bring closer to panel
-        legend.margin = ggplot2::margin(t=5, r=5, b=5, l=-10, unit = "pt")
+        legend.margin = ggplot2::margin(t=5, r=2, b=5, l=-10, unit = "pt"),
+        legend.title = text_fun(color = text_color, size = 4/6*base_size),
+        legend.text = ggplot2::element_text(color = text_color, size = 4/6*base_size,
+                                            margin = ggplot2::margin(l = 2, unit = "pt")) # brings legend text closer to bar
       )
   }
 

@@ -45,10 +45,10 @@ get_color_scale_continuous <- function(values,
 
   decimals <- brathering::decimals_adaptive(values)
   if (is.null(scale.max)) {
-    scale.max <- as.numeric(format(brathering::floor2(max(values), decimals), nsmall = decimals))
+    scale.max <- as.numeric(format(brathering::floor2(max(values, na.rm = T), decimals), nsmall = decimals))
   }
   if (is.null(scale.min)) {
-    scale.min <- as.numeric(format(brathering::ceiling2(min(values), decimals), nsmall = decimals))
+    scale.min <- as.numeric(format(brathering::ceiling2(min(values, na.rm = T), decimals), nsmall = decimals))
   }
   scale.mid <- ifelse(zscored, 0, as.numeric(format(round(scale.min + ((scale.max - scale.min) / 2), decimals), nsmall = decimals)))
 
