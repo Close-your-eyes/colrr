@@ -25,3 +25,5 @@ Imports:
     scales,
     grDevices,
     methods
+Depends: 
+    R (>= 3.5)

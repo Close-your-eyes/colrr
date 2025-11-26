@@ -22,7 +22,7 @@ col_pal(
 
 \item{contrast_filter}{remove colors if contrast to bg_color is below contrast_ratio_min.}
 
-\item{contrast_ratio_min}{minimum ration}
+\item{contrast_ratio_min}{minimum ratio; larger value for stricter difference}
 
 \item{bg_color}{background hex color or r color name}
 }
