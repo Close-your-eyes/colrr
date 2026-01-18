@@ -19,6 +19,7 @@
 #' @param scale.max formatted (e.g. rounded) max of values; if NULL, calculated
 #' within function
 #' @param scale.min see scale.max
+#' @param trans_log log transform colorscale?
 #'
 #' @returns ggplot scale object
 #' @export
@@ -36,7 +37,9 @@ get_color_scale_continuous <- function(values,
                                        qmin = 0,
                                        qmax = 1,
                                        scale.max = NULL,
-                                       scale.min = NULL) {
+                                       scale.min = NULL,
+                                       trans_log = F,
+                                       ...) {
 
   #qmin, qmax for featureplot2 from scexpr, for correct limits of colorsteps, colorsteps must be auto or vector
   # scale.min: provided from scexpr featureplot2 but exclude non expressers (=0)
@@ -86,7 +89,8 @@ get_color_scale_continuous <- function(values,
                colors = colors,
                breaks = legendbreaks,
                labels = legendlabels,
-               na.value = col_na)
+               na.value = col_na,
+               transform = ifelse(trans_log, "log10", "identity"))
   } else {
     ## colorstep legend
     if (type == "fill") {
@@ -102,9 +106,24 @@ get_color_scale_continuous <- function(values,
       } else {
         n <- ifelse(colorsteps == "..auto..", 6, colorsteps)
         if (colorsteps_nice) {
-          colorsteps <- scales:::extended_breaks(n = n)(c(round(scale.min, decimals), round(scale.max, decimals)))
+          if (trans_log) {
+            colorsteps <- scales::log_breaks(n = n)(
+              c(round(scale.min, decimals), round(scale.max, decimals))
+            )
+          } else {
+            colorsteps <- scales:::extended_breaks(n = n)(
+              c(round(scale.min, decimals), round(scale.max, decimals))
+            )
+          }
         } else {
-          colorsteps <- seq(round(scale.min), round(scale.max), length.out = n)
+          if (trans_log) {
+            colorsteps <- round(
+              10 ^ seq(log10(scale.min), log10(scale.max), length.out = n),
+              digits = 2
+            )
+          } else {
+            colorsteps <- seq(round(scale.min), round(scale.max), length.out = n)
+          }
           # make semi nice breaks?
           # round_auto_any(colorsteps)
         }
@@ -130,8 +149,8 @@ get_color_scale_continuous <- function(values,
       # only to alter limit labels
 
       #colorsteps <- round(seq(scale.min, scale.max, length.out = 6),1)
-      min.lab <- ifelse(qmin > 0, paste0(scale.min, " (q", round(qmin*100, 0), ")"), scale.min)
-      max.lab <- ifelse(qmax < 1, paste0(scale.max, " (q", round(qmax*100, 0), ")"), scale.max)
+      min.lab <- ifelse(qmin > 0, paste0(scale.min, " (q", qmin*100, ")"), scale.min)
+      max.lab <- ifelse(qmax < 1, paste0(scale.max, " (q", qmax*100, ")"), scale.max)
 
       colorstepbreaks <- colorsteps
       #if (dplyr::near(colorstepbreaks[1], scale.min)) {

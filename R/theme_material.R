@@ -39,9 +39,9 @@ theme_material <- function(base_size = 12,
   if (white) {
     text_color = "black"
     bg_color = "white"
-    bg_color2 = "grey90"
+    bg_color2 = "grey95"
     axes_color = "black"
-    grid_color = "grey60"
+    grid_color = "grey70"
   } else {
     axes_color <- "white"
     grid_color = bg_color2
@@ -57,15 +57,15 @@ theme_material <- function(base_size = 12,
       plot.tag = text_fun(color = text_color),
       axis.title = text_fun(color = text_color),
       axis.title.x = text_fun(color = text_color),
-      axis.title.y = text_fun(color = text_color),
+      axis.title.y = text_fun(color = text_color, angle = 90),
       axis.text = text_fun(color = text_color),
       axis.text.x = text_fun(color = text_color),
       axis.text.y = text_fun(color = text_color),
-      legend.title = text_fun(color = text_color),
-      legend.text = ggplot2::element_text(color = text_color), # this as element_markdown locks height of legend bar
-      strip.text = text_fun(color = text_color),
-      strip.text.x = text_fun(color = text_color),
-      strip.text.y = text_fun(color = text_color),
+      legend.title = text_fun(color = text_color, size = 5/6*base_size),
+      legend.text = ggplot2::element_text(color = text_color, size = 5/6*base_size), # this as element_markdown locks height of legend bar
+      strip.text = text_fun(color = text_color, margin = ggplot2::margin(2,0,2,0, unit = "pt")),
+      strip.text.x = text_fun(color = text_color, margin = ggplot2::margin(2,0,2,0, unit = "pt")),
+      strip.text.y = text_fun(color = text_color, margin = ggplot2::margin(0,5,0,2, unit = "pt")),
 
       # Backgrounds
       plot.background = ggplot2::element_rect(fill = bg_color, color = NA),
@@ -95,8 +95,8 @@ theme_material <- function(base_size = 12,
         legend.key.spacing.x = ggplot2::unit(2, "pt"),
         # negative left: bring closer to panel
         legend.margin = ggplot2::margin(t=5, r=2, b=5, l=-10, unit = "pt"),
-        legend.title = text_fun(color = text_color, size = 4/6*base_size),
-        legend.text = ggplot2::element_text(color = text_color, size = 4/6*base_size,
+        legend.title = text_fun(color = text_color, size = 5/6*base_size),
+        legend.text = ggplot2::element_text(color = text_color, size = 5/6*base_size,
                                             margin = ggplot2::margin(l = 2, unit = "pt")) # brings legend text closer to bar
       )
   }

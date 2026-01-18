@@ -17,7 +17,9 @@ get_color_scale_continuous(
   qmin = 0,
   qmax = 1,
   scale.max = NULL,
-  scale.min = NULL
+  scale.min = NULL,
+  trans_log = F,
+  ...
 )
 }
 \arguments{
@@ -50,6 +52,8 @@ ggplot2::scale_fill/color_stepsn}
 within function}
 
 \item{scale.min}{see scale.max}
+
+\item{trans_log}{log transform colorscale?}
 }
 \value{
 ggplot scale object
