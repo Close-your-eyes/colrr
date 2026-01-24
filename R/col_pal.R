@@ -9,6 +9,7 @@
 #' @param contrast_filter remove colors if contrast to bg_color is below contrast_ratio_min.
 #' @param contrast_ratio_min minimum ratio; larger value for stricter difference
 #' @param bg_color background hex color or r color name
+#' @param return what to return? vecror of colors or character?
 #'
 #' @return a color palette as character vector
 #' @export
@@ -21,7 +22,8 @@ col_pal <- function(name = NULL,
                     direction = c(1,-1),
                     contrast_filter = F,
                     contrast_ratio_min = 1.5,
-                    bg_color = "white") {
+                    bg_color = "white",
+                    return = c("col", "color", "c", "char", "character")) {
 
   if (!requireNamespace("paletteer", quietly = T)) {
     utils::install.packages("paletteer")
@@ -39,6 +41,18 @@ col_pal <- function(name = NULL,
   }
 
   direction <- as.numeric(match.arg(as.character(direction), choices = c("1","-1")))
+  return <- rlang::arg_match(return)
+
+  col_names <- NULL
+  if (!is.null(n) && !is.numeric(n)) {
+    if (is.factor(n)) {
+      col_names <- levels(n)
+      n <- nlevels(n)
+    } else {
+      col_names <- unique(n)
+      n <- length(col_names)
+    }
+  }
 
   if (name %in% c("ggplot", "ggplot2", "hue", "hue_pal", "huepal")) {
     if (is.null(n) || n == 0) {
@@ -107,7 +121,14 @@ col_pal <- function(name = NULL,
   if (direction == -1) {
     pal_return <- rev(pal_return)
   }
+
+  # r color names become hex colors?!
   pal_return <- prismatic::color(pal_return)
+
+  if (return %in% c("c", "char", "character")) {
+    pal_return <- as.character(pal_return)
+  }
+  names(pal_return) <- col_names
 
   if (length(pal_return) > 200) {
     invisible(pal_return)

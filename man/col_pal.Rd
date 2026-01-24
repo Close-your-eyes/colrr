@@ -10,7 +10,8 @@ col_pal(
   direction = c(1, -1),
   contrast_filter = F,
   contrast_ratio_min = 1.5,
-  bg_color = "white"
+  bg_color = "white",
+  return = c("col", "color", "c", "char", "character")
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ col_pal(
 \item{contrast_ratio_min}{minimum ratio; larger value for stricter difference}
 
 \item{bg_color}{background hex color or r color name}
+
+\item{return}{what to return? vecror of colors or character?}
 }
 \value{
 a color palette as character vector
