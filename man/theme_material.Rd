@@ -6,9 +6,11 @@
 \usage{
 theme_material(
   base_size = 12,
-  text_color = "white",
-  bg_color = "#273238",
-  bg_color2 = "#4F5C69",
+  text_color = ifelse(white, "black", "white"),
+  bg_color = ifelse(white, "white", "#273238"),
+  bg_color2 = ifelse(white, "grey85", "#4F5C69"),
+  axes_color = ifelse(white, "black", "white"),
+  grid_color = ifelse(white, "grey70", bg_color2),
   text_fun = ggplot2::element_text,
   style = c("prism", "prismy", "prismx", "base"),
   white = F,
@@ -24,6 +26,8 @@ theme_material(
 \item{bg_color}{background color, not intended to be changed dramatically}
 
 \item{bg_color2}{background color 2, e.g. for facet strip}
+
+\item{grid_color}{}
 
 \item{text_fun}{function for text elements, ggplot2::element_text or
 ggtext::element_markdown}

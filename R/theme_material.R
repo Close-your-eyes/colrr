@@ -12,6 +12,8 @@
 #' @param white use a light color scale with white bg
 #' @param legend_tight legend more compact and closer to plot panel
 #' @param ... arguments to text = ggplot2::element_text
+#' @param axes_color
+#' @param grid_color
 #'
 #' @return ggplot2 theme
 #' @export
@@ -26,9 +28,11 @@
 #' gplot + colrr::theme_material(text_color = "hotpink", style = "base")
 
 theme_material <- function(base_size = 12,
-                           text_color = "white",
-                           bg_color = "#273238",
-                           bg_color2 = "#4F5C69",
+                           text_color = ifelse(white, "black", "white"),
+                           bg_color = ifelse(white, "white", "#273238"),
+                           bg_color2 = ifelse(white, "grey85", "#4F5C69"),
+                           axes_color = ifelse(white, "black", "white"),
+                           grid_color = ifelse(white, "grey70", bg_color2),
                            text_fun = ggplot2::element_text,
                            style = c("prism", "prismy", "prismx", "base"),
                            white = F,
@@ -36,16 +40,6 @@ theme_material <- function(base_size = 12,
                            ...) {
 
   style <- rlang::arg_match(style)
-  if (white) {
-    text_color = "black"
-    bg_color = "white"
-    bg_color2 = "grey95"
-    axes_color = "black"
-    grid_color = "grey70"
-  } else {
-    axes_color <- "white"
-    grid_color = bg_color2
-  }
 
   thistheme <- ggplot2::theme_grey(base_size = base_size) +
     ggplot2::theme(
@@ -70,7 +64,7 @@ theme_material <- function(base_size = 12,
       # Backgrounds
       plot.background = ggplot2::element_rect(fill = bg_color, color = NA),
       panel.background = ggplot2::element_rect(fill = bg_color, color = NA),
-      strip.background = ggplot2::element_rect(fill = bg_color2, color = "white"),
+      strip.background = ggplot2::element_rect(fill = bg_color2, color = NA),
       legend.background = ggplot2::element_blank(),
 
       # axes and misc

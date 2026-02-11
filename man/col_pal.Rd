@@ -11,7 +11,10 @@ col_pal(
   contrast_filter = F,
   contrast_ratio_min = 1.5,
   bg_color = "white",
-  return = c("col", "color", "c", "char", "character")
+  return = c("col", "color", "c", "char", "character"),
+  hex = F,
+  shuffle = F,
+  seed = 42
 )
 }
 \arguments{
@@ -27,14 +30,21 @@ col_pal(
 
 \item{bg_color}{background hex color or r color name}
 
-\item{return}{what to return? vecror of colors or character?}
+\item{return}{what to return? vector of colors or character?}
+
+\item{hex}{return hex colors in any case (when return = "char")}
+
+\item{shuffle}{shuffle color vector randomly}
+
+\item{seed}{seed for shuffling}
 }
 \value{
 a color palette as character vector
 }
 \description{
-Wrapper function around paletteer and two additional color palettes.
+Wrapper function around paletteer and additional color palettes.
 See paletteer::palettes_c_names and paletteer::palettes_d_names.
+Other palettes: custom, custom_light, material, cold, customx.
 }
 \examples{
 col_pal(name = "custom", n = 10)

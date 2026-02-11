@@ -1,7 +1,8 @@
 #' Color palettes
 #'
-#' Wrapper function around paletteer and two additional color palettes.
+#' Wrapper function around paletteer and additional color palettes.
 #' See paletteer::palettes_c_names and paletteer::palettes_d_names.
+#' Other palettes: custom, custom_light, material, cold, customx.
 #'
 #' @param name name of the palette
 #' @param n number of colors to return; may not work for every palette
@@ -9,7 +10,10 @@
 #' @param contrast_filter remove colors if contrast to bg_color is below contrast_ratio_min.
 #' @param contrast_ratio_min minimum ratio; larger value for stricter difference
 #' @param bg_color background hex color or r color name
-#' @param return what to return? vecror of colors or character?
+#' @param return what to return? vector of colors or character?
+#' @param shuffle shuffle color vector randomly
+#' @param seed seed for shuffling
+#' @param hex return hex colors in any case (when return = "char")
 #'
 #' @return a color palette as character vector
 #' @export
@@ -23,7 +27,10 @@ col_pal <- function(name = NULL,
                     contrast_filter = F,
                     contrast_ratio_min = 1.5,
                     bg_color = "white",
-                    return = c("col", "color", "c", "char", "character")) {
+                    return = c("col", "color", "c", "char", "character"),
+                    hex = F,
+                    shuffle = F,
+                    seed = 42) {
 
   if (!requireNamespace("paletteer", quietly = T)) {
     utils::install.packages("paletteer")
@@ -60,7 +67,7 @@ col_pal <- function(name = NULL,
     }
     pal_return <- scales::hue_pal()(n)
 
-  } else if (name %in% c("custom", "material", "custom_light")) {
+  } else if (name %in% c("custom", "material", "custom_light", "cold")) {
 
     pal_return <- utils::getFromNamespace(name, "colrr")
     if (!is.null(n) && n > 0) {
@@ -122,13 +129,24 @@ col_pal <- function(name = NULL,
     pal_return <- rev(pal_return)
   }
 
-  # r color names become hex colors?!
-  pal_return <- prismatic::color(pal_return)
+
 
   if (return %in% c("c", "char", "character")) {
+    if (hex) {
+      # r color names become hex colors
+      pal_return <- prismatic::color(pal_return)
+    }
     pal_return <- as.character(pal_return)
+  } else {
+    # r color names become hex colors
+    pal_return <- prismatic::color(pal_return)
   }
   names(pal_return) <- col_names
+
+  if (shuffle) {
+    set.seed(seed)
+    pal_return <- sample(pal_return)
+  }
 
   if (length(pal_return) > 200) {
     invisible(pal_return)

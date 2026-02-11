@@ -103,5 +103,30 @@ material <- c(
   "#C5C8C6",
   "#50C186")
 
-usethis::use_data(custom, custom_light, material,
+cold <- c(
+  "grey90",
+  "slategray3",
+  "grey50"
+)
+
+customx <- c(
+  "navy",
+  "tan4",
+  "darkorchid4",
+  "mediumpurple1",
+  "plum1",
+  "turquoise3",
+  "cadetblue1",
+  "cornflowerblue",
+  "darkorange",
+  "tomato3",
+  "lightgreen",
+  "forestgreen",
+  "olivedrab3",
+  "darkgoldenrod1",
+  "khaki1",
+  "grey65"
+)
+
+usethis::use_data(custom, custom_light, material, cold, customx,
                   overwrite = T, internal = T)
