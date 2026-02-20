@@ -11,7 +11,7 @@ closest_color(hex, n = 1, print = T)
 
 \item{n}{top n closest colors}
 
-\item{print}{do print both colors side-by-side?}
+\item{print}{do print colors side-by-side?}
 }
 \value{
 color name
@@ -20,5 +20,5 @@ color name
 Find most similar built-in R color
 }
 \examples{
-closest_color("#f030e3")
+closest_color(hex =  rainbow(10))
 }
