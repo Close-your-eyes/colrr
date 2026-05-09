@@ -27,8 +27,6 @@ theme_material(
 
 \item{bg_color2}{background color 2, e.g. for facet strip}
 
-\item{grid_color}{}
-
 \item{text_fun}{function for text elements, ggplot2::element_text or
 ggtext::element_markdown}
 
