@@ -1,6 +1,5 @@
 library(ggplot2)
-
-pak::pak("Close-your-eyes/colrr")
+# pak::pak("Close-your-eyes/colrr")
 library(colrr)
 
 df <- data.frame(x = rnorm(1000),
@@ -50,6 +49,15 @@ p + colrr::get_scale_color_fun(df$z,
 p + colrr::get_scale_color_fun(df$z,
                                palette = grDevices::rainbow(n = 50),
                                steps = 10)
+
+# jet palette
+p + colrr::get_scale_color_fun(df$z,
+                               palette = colrr::col_pal("jet"),
+                               steps = NULL)
+
+p + colrr::get_scale_color_fun(df$z,
+                               palette = colrr::col_pal("jetColors"),
+                               steps = NULL)
 
 p + colrr::get_scale_color_fun(df$z,
                                palette = colrr::col_pal("spectral", direction = -1),

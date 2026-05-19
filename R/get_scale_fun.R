@@ -75,6 +75,14 @@
 #' p + colrr::get_scale_color_fun(df$z,
 #'                                palette = grDevices::rainbow(n = 50),
 #'                                steps = 10)
+#' # jet palette
+#' p + colrr::get_scale_color_fun(df$z,
+#'                                palette = colrr::col_pal("jet"),
+#'                                steps = NULL)
+#'
+#' p + colrr::get_scale_color_fun(df$z,
+#'                                palette = colrr::col_pal("jetColors"),
+#'                                steps = NULL)
 #'
 #' p + colrr::get_scale_color_fun(df$z,
 #'                                palette = colrr::col_pal("spectral", direction = -1),
@@ -196,7 +204,7 @@ get_scale_fun <- function(values,
 
       scale_obj <-
         scalefun(colors = palette,
-                 values = values,
+                 values = scales::rescale(steps),
                  breaks = c(sclfeat[["min"]], scllabs[["mids"]], sclfeat[["max"]]), # manually add limits as breaks
                  limits = c(sclfeat[["min"]], sclfeat[["max"]]), # limit must be he same as outer breaks
                  labels = c(scllabs[["min"]], format(scllabs[["mids"]], nsmall = sclfeat[["decimals"]]), scllabs[["max"]]),
@@ -206,7 +214,8 @@ get_scale_fun <- function(values,
 
       scale_obj <-
         scalefun(colors = palette,
-                 values = values,
+                 #values = values,
+                 values = scales::rescale(steps),
                  breaks = steps, #round(steps, decimals),
                  #labels = format(steps, nsmall = decimals),
                  limits = c(sclfeat[["min"]], sclfeat[["max"]]), #c(min, max), # what about relevant decimals?
