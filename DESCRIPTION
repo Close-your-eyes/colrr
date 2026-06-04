@@ -1,7 +1,7 @@
 Package: colrr
 Type: Package
 Title: Color related functions
-Version: 0.1.1
+Version: 0.1.2
 Description: Custom color palettes and a wrapper around paletteer.
 License: AGPL (>= 3)
 Encoding: UTF-8

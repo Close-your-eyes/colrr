@@ -12,8 +12,8 @@
 #' @param white use a light color scale with white bg
 #' @param legend_tight legend more compact and closer to plot panel
 #' @param ... arguments to text = ggplot2::element_text
-#' @param axes_color
-#' @param grid_color
+#' @param axes_color color of axes lines
+#' @param grid_color color of grid lines
 #'
 #' @return ggplot2 theme
 #' @export

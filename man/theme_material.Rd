@@ -27,6 +27,10 @@ theme_material(
 
 \item{bg_color2}{background color 2, e.g. for facet strip}
 
+\item{axes_color}{color of axes lines}
+
+\item{grid_color}{color of grid lines}
+
 \item{text_fun}{function for text elements, ggplot2::element_text or
 ggtext::element_markdown}
 

@@ -2,7 +2,15 @@
 #'
 #' Wrapper function around paletteer and additional color palettes.
 #' See paletteer::palettes_c_names and paletteer::palettes_d_names.
-#' Other palettes: custom, custom_light, material, cold, customx.
+#' Other palettes:
+#' "custom",
+#' "custom2",
+#' "custom3",
+#' "custom4",
+#' "customx",
+#' "material",
+#' "custom_light",
+#' "cold"
 #'
 #' @param name name of the palette
 #' @param n number of colors to return; may not work for every palette
@@ -61,13 +69,28 @@ col_pal <- function(name = NULL,
     }
   }
 
-  if (name %in% c("ggplot", "ggplot2", "hue", "hue_pal", "huepal")) {
+  if (name %in% c(
+    "ggplot",
+    "ggplot2",
+    "hue",
+    "hue_pal",
+    "huepal"
+  )) {
     if (is.null(n) || n == 0) {
       n <- 100
     }
     pal_return <- scales::hue_pal()(n)
 
-  } else if (name %in% c("custom", "material", "custom_light", "cold")) {
+  } else if (name %in% c(
+    "custom",
+    "custom2",
+    "custom3",
+    "custom4",
+    "customx",
+    "material",
+    "custom_light",
+    "cold"
+  )) {
 
     pal_return <- utils::getFromNamespace(name, "colrr")
     if (!is.null(n) && n > 0) {

@@ -44,7 +44,15 @@ a color palette as character vector
 \description{
 Wrapper function around paletteer and additional color palettes.
 See paletteer::palettes_c_names and paletteer::palettes_d_names.
-Other palettes: custom, custom_light, material, cold, customx.
+Other palettes:
+"custom",
+"custom2",
+"custom3",
+"custom4",
+"customx",
+"material",
+"custom_light",
+"cold"
 }
 \examples{
 col_pal(name = "custom", n = 10)
