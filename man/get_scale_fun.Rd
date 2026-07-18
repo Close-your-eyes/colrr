@@ -21,6 +21,7 @@ get_scale_fun(
   scale_max = NULL,
   scale_min = NULL,
   trans_log = F,
+  center_zero = F,
   ...
 )
 
@@ -38,6 +39,7 @@ get_scale_color_fun(
   scale_max = NULL,
   scale_min = NULL,
   trans_log = F,
+  center_zero = F,
   ...
 )
 
@@ -55,6 +57,7 @@ get_scale_fill_fun(
   scale_max = NULL,
   scale_min = NULL,
   trans_log = F,
+  center_zero = F,
   ...
 )
 }

@@ -10,7 +10,7 @@ theme_material(
   bg_color = ifelse(white, "white", "#273238"),
   bg_color2 = ifelse(white, "grey85", "#4F5C69"),
   axes_color = ifelse(white, "black", "white"),
-  grid_color = ifelse(white, "grey70", bg_color2),
+  grid_color = ifelse(white, "grey90", bg_color2),
   text_fun = ggplot2::element_text,
   style = c("prism", "prismy", "prismx", "base"),
   white = F,

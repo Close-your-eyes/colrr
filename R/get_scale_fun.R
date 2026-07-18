@@ -130,6 +130,7 @@ get_scale_fun <- function(values,
                           scale_max = NULL,
                           scale_min = NULL,
                           trans_log = F,
+                          center_zero = F,
                           ...) {
 
   if (!requireNamespace("brathering", quietly = T)) {
@@ -145,6 +146,16 @@ get_scale_fun <- function(values,
 
   type <- rlang::arg_match(type)
 
+  if (length(unique(values)) == 1) {
+    if (type == "fill") {
+      scalefun <- ggplot2::scale_fill_gradientn
+    } else {
+      scalefun <- ggplot2::scale_color_gradientn
+    }
+    scale_obj <- scalefun(colors = palette)
+    return(scale_obj)
+  }
+
   if (qmax > 1) {
     qmax <- qmax/100
     qmin <- qmin/100
@@ -154,9 +165,31 @@ get_scale_fun <- function(values,
     values = values,
     scale_min = scale_min,
     scale_max = scale_max,
-    zscored = zscored
-  )
-  values <- scales::rescale(c(sclfeat[["min"]], sclfeat[["mid"]], sclfeat[["max"]]))
+    zscored = zscored)
+
+  limits <- c(sclfeat[["min"]], sclfeat[["max"]])
+  zero_pos <- scales::rescale(0, from = limits)
+
+  steps <- make_steps(steps = steps,
+                      sclfeat = sclfeat,
+                      trans_log = trans_log,
+                      steps_nice = steps_nice)
+  names(steps) <- format(steps) # just as with limits above: shift all values by one char if there are negative values
+  # check if it is appropriate in all situations
+
+  if (!is.null(steps)) {
+    names(limits) <- format(limits, nsmall = max(brathering::get_decimal_places(steps)))
+  }
+
+  if (center_zero) {
+    values <- c(0, zero_pos, 1)
+  } else {
+    if (is.null(steps)) {
+      values <- scales::rescale(c(sclfeat[["min"]], sclfeat[["mid"]], sclfeat[["max"]]))
+    } else {
+      values <- scales::rescale(steps)
+    }
+  }
 
 
   if (is.null(steps)) {
@@ -188,11 +221,6 @@ get_scale_fun <- function(values,
       scalefun <- ggplot2::scale_color_stepsn
     }
 
-    steps <- make_steps(steps = steps,
-                        sclfeat = sclfeat,
-                        trans_log = trans_log,
-                        steps_nice = steps_nice)
-
     # change limits
     if (qmin > 0 || qmax < 1) {
 
@@ -201,12 +229,13 @@ get_scale_fun <- function(values,
                                  qmax = qmax,
                                  sclfeat = sclfeat,
                                  steps = steps)
-
+      # labels, breaks, limits still a bit mixed up with naming etc, but seems to work
       scale_obj <-
         scalefun(colors = palette,
-                 values = scales::rescale(steps),
+                 values = values,
+                 nice.breaks = F,
                  breaks = c(sclfeat[["min"]], scllabs[["mids"]], sclfeat[["max"]]), # manually add limits as breaks
-                 limits = c(sclfeat[["min"]], sclfeat[["max"]]), # limit must be he same as outer breaks
+                 limits = limits, # limit must be he same as outer breaks
                  labels = c(scllabs[["min"]], format(scllabs[["mids"]], nsmall = sclfeat[["decimals"]]), scllabs[["max"]]),
                  na.value = col_na)
 
@@ -214,15 +243,13 @@ get_scale_fun <- function(values,
 
       scale_obj <-
         scalefun(colors = palette,
-                 #values = values,
-                 values = scales::rescale(steps),
-                 breaks = steps, #round(steps, decimals),
-                 #labels = format(steps, nsmall = decimals),
-                 limits = c(sclfeat[["min"]], sclfeat[["max"]]), #c(min, max), # what about relevant decimals?
+                 values = values,
+                 breaks = steps,
+                 #labels = format(steps, nsmall = decimals), # done with name of steps
+                 limits = limits,
                  show.limits = T,
                  nice.breaks = F, # is done above
                  na.value = col_na)
-
     }
   }
 
@@ -244,6 +271,7 @@ get_scale_color_fun <- function(values,
                                 scale_max = NULL,
                                 scale_min = NULL,
                                 trans_log = F,
+                                center_zero = F,
                                 ...) {
 
   out <- get_scale_fun(values = values,
@@ -259,7 +287,8 @@ get_scale_color_fun <- function(values,
                        qmax = qmax,
                        scale_max = scale_max,
                        scale_min = scale_min,
-                       trans_log = trans_log)
+                       trans_log = trans_log,
+                       center_zero = center_zero)
 
   return(out)
 
@@ -280,6 +309,7 @@ get_scale_fill_fun <- function(values,
                                scale_max = NULL,
                                scale_min = NULL,
                                trans_log = F,
+                               center_zero = F,
                                ...) {
 
   out <- get_scale_fun(values = values,
@@ -295,7 +325,8 @@ get_scale_fill_fun <- function(values,
                        qmax = qmax,
                        scale_max = scale_max,
                        scale_min = scale_min,
-                       trans_log = trans_log)
+                       trans_log = trans_log,
+                       center_zero = center_zero)
 
   return(out)
 
@@ -330,7 +361,8 @@ get_features <- function(values,
     decimals = decimals,
     max = scale_max,
     mid = scale_mid,
-    min = scale_min
+    min = scale_min,
+    uniques = stats::na.omit(sort(unique(values)))
   ))
 }
 
@@ -373,6 +405,7 @@ make_steps <- function(steps = "..auto..",
   decimals <- sclfeat[["decimals"]]
   zscored <- sclfeat[["zscored"]]
 
+
   steps <- sort(unique(steps))
   if (length(steps) == 1) {
     if (zscored) {
@@ -410,11 +443,26 @@ make_steps <- function(steps = "..auto..",
         # make semi nice breaks?
         # round_auto_any(steps)
       }
+
+      steps <- steps[-c(1,length(steps))]
     }
     # remove limits as they appear anyway
-    steps <- steps[-c(1,length(steps))]
+    # steps <- steps[-c(1,length(steps))]
   } else {
     # steps is a vector
+  }
+
+  if (length(sclfeat[["uniques"]]) <= length(steps)) {
+    steps <- sclfeat[["uniques"]]
+    if (length(steps) == 1) {
+      steps <- c(steps, steps+1)
+    }
+  }
+  if (brathering::is_int_like(sclfeat$uniques) && !brathering::is_int_like(steps)) {
+    steps <- unique(round(steps))
+    if (length(steps) == 1) {
+      steps <- c(steps, steps+1)
+    }
   }
 
   return(steps)
@@ -424,21 +472,27 @@ make_new_limits <- function(qmin = 0,
                             qmax = 1,
                             sclfeat,
                             steps) {
-  min <- sclfeat[["min"]]
-  decimals <- sclfeat[["decimals"]]
-  max <- sclfeat[["max"]]
+
+  # min <- sclfeat[["min"]]
+  # max <- sclfeat[["max"]]
+
+  decimals <- max(sclfeat[["decimals"]], brathering::get_decimal_places(steps))
+  steps2 <- c(sclfeat[["min"]], steps, sclfeat[["max"]])
+  names(steps2) <- format(steps2)
+  min <- names(steps2)[1]
+  max <- names(steps2)[length(names(steps2))]
 
   min.lab <- ifelse(qmin > 0, paste0(min, " (q", qmin*100, ")"), min)
   max.lab <- ifelse(qmax < 1, paste0(max, " (q", qmax*100, ")"), max)
 
   colorstepbreaks <- steps
   #if (dplyr::near(colorstepbreaks[1], min)) {
-  while(length(colorstepbreaks) > 0 && colorstepbreaks[1] < min) {
+  while(length(colorstepbreaks) > 0 && colorstepbreaks[1] < as.numeric(min)) {
     colorstepbreaks <- colorstepbreaks[-1]
   }
 
   #if (dplyr::near(colorstepbreaks[length(colorstepbreaks)], max)) {
-  while(length(colorstepbreaks) > 0 && colorstepbreaks[length(colorstepbreaks)] > max) {
+  while(length(colorstepbreaks) > 0 && colorstepbreaks[length(colorstepbreaks)] > as.numeric(max)) {
     colorstepbreaks <- colorstepbreaks[-length(colorstepbreaks)]
   }
   colorstepbreaks <- round(colorstepbreaks, digits = decimals)
