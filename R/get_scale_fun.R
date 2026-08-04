@@ -174,7 +174,7 @@ get_scale_fun <- function(values,
                       sclfeat = sclfeat,
                       trans_log = trans_log,
                       steps_nice = steps_nice)
-  names(steps) <- format(steps) # just as with limits above: shift all values by one char if there are negative values
+  names(steps) <- format(steps, nsmall = max(brathering::get_decimal_places(limits))) # just as with limits above: shift all values by one char if there are negative values
   # check if it is appropriate in all situations
 
   if (!is.null(steps)) {
@@ -336,6 +336,8 @@ get_features <- function(values,
                          scale_min = NULL,
                          scale_max = NULL,
                          zscored = NULL) {
+
+
   if (is.null(zscored)) {
     zscored <- brathering::is_z_scored(values, verbose = F)
     if (zscored) {
@@ -343,14 +345,16 @@ get_features <- function(values,
     }
   }
 
+  #brathering::
   decimals <- brathering::decimals_adaptive(values)
 
   if (is.null(scale_max)) {
-    scale_max <- as.numeric(format(brathering::floor2(max(values, na.rm = T), decimals),
+    # values[which(is.finite(values))]
+    scale_max <- as.numeric(format(brathering::floor2(max(values[which(is.finite(values))], na.rm = T), decimals),
                                    nsmall = decimals))
   }
   if (is.null(scale_min)) {
-    scale_min <- as.numeric(format(brathering::ceiling2(min(values, na.rm = T), decimals),
+    scale_min <- as.numeric(format(brathering::ceiling2(min(values[which(is.finite(values))], na.rm = T), decimals),
                                    nsmall = decimals))
   }
   scale_mid <- ifelse(zscored, 0, as.numeric(format(round(scale_min + ((scale_max - scale_min) / 2), decimals),
@@ -465,7 +469,7 @@ make_steps <- function(steps = "..auto..",
     }
   }
 
-  return(steps)
+  return(unique(steps))
 }
 
 make_new_limits <- function(qmin = 0,
