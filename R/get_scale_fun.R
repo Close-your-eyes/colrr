@@ -22,6 +22,9 @@
 #'       `"..noniles.."`, `"..deciles.."`, or `"..quantiles.."`.
 #'     \item A numeric n-tile specification such as `"..6tiles.."` or
 #'       `"..12tiles.."`.
+#'     \item leading and trailing dots are optional
+#'     \item add a trailing "0" behind tiles, e.g. `"octiles0"` will only
+#'     use scale values above 0 to derive bins
 #'   }
 #' @param legendbreaks Break positions for a continuous colour-bar legend.
 #'   Use `"..auto.."` for ggplot2 defaults, `"minmidmax"` for the scale
@@ -463,9 +466,12 @@ make_steps <- function(steps = "..auto..",
   zscored <- sclfeat[["zscored"]]
 
   steps <- sort(unique(steps))
-
   if (grepl("tiles", steps[1], ignore.case = T)) {
-    steps <- resolve_steps(steps = steps[1], values = sclfeat[["values"]])
+    if (grepl("0$", steps[1])) {
+      steps <- resolve_steps(steps = steps[1], values = sclfeat[["values"]][which(sclfeat[["values"]]>0)])
+    } else {
+      steps <- resolve_steps(steps = steps[1], values = sclfeat[["values"]])
+    }
   }
 
   if (length(steps) == 1) {

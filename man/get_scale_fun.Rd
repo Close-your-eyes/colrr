@@ -81,6 +81,9 @@ this is determined automatically.}
     `"..noniles.."`, `"..deciles.."`, or `"..quantiles.."`.
   \item A numeric n-tile specification such as `"..6tiles.."` or
     `"..12tiles.."`.
+  \item leading and trailing dots are optional
+  \item add a trailing "0" behind tiles, e.g. `"octiles0"` will only
+  use scale values above 0 to derive bins
 }}
 
 \item{legendbreaks}{Break positions for a continuous colour-bar legend.
