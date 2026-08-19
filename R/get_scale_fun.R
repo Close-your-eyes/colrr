@@ -1,121 +1,122 @@
-#' Make a continuous fill/color scale for ggplot
+#' Create a continuous or binned ggplot2 colour scale
 #'
-#' Make nice default color steps.
+#' Creates a continuous gradient or a binned colour scale for the `fill` or
+#' `colour` aesthetic. Breaks can be calculated automatically, supplied
+#' explicitly, or derived from quantiles such as quartiles, quintiles, or
+#' deciles.
 #'
-#' @param values vector of numeric values
-#' @param zscored are values z-scored? if NULL, evaluated within function
-#' @param steps NULL for colorbar, a number for number of steps or a vector or
-#' ..auto.. for decision based on zscored etc; when steps_nice = T it
-#' influences number of steps
-#' @param legendbreaks vector of breaks
-#' @param legendlabels vector of labels
-#' @param palette to color arg of ggplot2::scale_fill/color_gradientn or
-#' ggplot2::scale_fill/color_stepsn
-#' @param steps_nice to nice.breaks in ggplot2::scale_fill/color_stepsn
-#' @param type fill or color type to return
-#' @param col_na color for NA values
-#' @param qmin adjust legend by percentile cutoff at lower end
-#' @param qmax adjust legend by percentile cutoff at upper end
-#' @param scale_max formatted (e.g. rounded) max of values; if NULL, calculated
-#' within function
-#' @param scale_min see max
-#' @param trans_log log transform colorscale?
-#' @param ...
+#' @param values Numeric vector used to determine the scale limits, breaks,
+#'   quantiles, and z-score status. Missing and non-finite values are ignored
+#'   where appropriate.
+#' @param zscored Logical indicating whether `values` are z-scored. If `NULL`,
+#'   this is determined automatically.
+#' @param steps Controls whether and how the scale is binned. One of:
+#'   \itemize{
+#'     \item `NULL` for a continuous colour bar.
+#'     \item A single number giving the approximate number of breaks.
+#'     \item A numeric vector giving the exact internal break positions.
+#'     \item `"..auto.."` to choose breaks automatically.
+#'     \item A named n-tile specification: `"..tertiles.."`,
+#'       `"..terciles.."`, `"..quartiles.."`, `"..quintiles.."`,
+#'       `"..sextiles.."`, `"..septiles.."`, `"..octiles.."`,
+#'       `"..noniles.."`, `"..deciles.."`, or `"..quantiles.."`.
+#'     \item A numeric n-tile specification such as `"..6tiles.."` or
+#'       `"..12tiles.."`.
+#'   }
+#' @param legendbreaks Break positions for a continuous colour-bar legend.
+#'   Use `"..auto.."` for ggplot2 defaults, `"minmidmax"` for the scale
+#'   minimum, midpoint, and maximum, a single number for evenly spaced
+#'   breaks, or a numeric vector for explicit breaks.
+#' @param legendlabels Labels for `legendbreaks`. Use `"..auto.."` for
+#'   ggplot2 defaults. When supplied explicitly, the number of labels should
+#'   equal the number of breaks.
+#' @param palette Character vector of colours passed to
+#'   [ggplot2::scale_fill_gradientn()], [ggplot2::scale_colour_gradientn()],
+#'   [ggplot2::scale_fill_stepsn()], or
+#'   [ggplot2::scale_colour_stepsn()].
+#' @param steps_nice Logical. If `TRUE`, automatically generated numeric
+#'   breaks are adjusted to visually convenient values. This has no effect
+#'   on explicit break vectors or n-tile breaks.
+#' @param type Aesthetic for which the scale is created: `"fill"` or
+#'   `"color"`.
+#' @param col_na Colour assigned to missing values.
+#' @param qmin,qmax Lower and upper quantiles represented by the supplied
+#'   data limits. Values may be given as proportions between 0 and 1 or as
+#'   percentages. These arguments affect the displayed limit labels.
+#' @param scale_min,scale_max Optional numeric scale limits. If `NULL`, they
+#'   are calculated from the finite values in `values`.
+#' @param trans_log Logical. If `TRUE`, apply a base-10 logarithmic colour
+#'   transformation. All finite values and scale limits must then be
+#'   positive.
+#' @param center_zero Logical. If `TRUE`, position the centre of the palette
+#'   at zero. This is primarily intended for diverging continuous scales and
+#'   cannot be combined meaningfully with a logarithmic transformation.
+#' @param ... Additional arguments reserved for scale customization.
 #'
-#' @returns ggplot scale object
+#' @details
+#' Named n-tile specifications use empirical quantiles as internal bin
+#' boundaries. For example, `steps = "..quartiles.."` creates breaks at
+#' probabilities 0.25, 0.50, and 0.75, producing four bins.
+#'
+#' N-tile bins contain approximately equal numbers of observations, but their
+#' numeric widths may differ. Colours are sampled evenly from `palette` and
+#' positioned at the midpoint of each bin. Consequently, each bin receives
+#' an evenly spaced colour from the palette regardless of its width in data
+#' space.
+#'
+#' Repeated values can produce duplicate quantiles. Duplicate boundaries are
+#' removed, so data with many ties may produce fewer than the requested
+#' number of bins.
+#'
+#' @return A ggplot2 continuous or binned colour-scale object.
+#'
 #' @export
 #'
 #' @examples
 #' library(ggplot2)
-#' library(colrr)
 #'
-#' df <- data.frame(x = rnorm(1000),
-#'                  y = rnorm(1000),
-#'                  z = rnorm(1000))
+#' set.seed(1)
+#' df <- data.frame(
+#'   x = rnorm(1000),
+#'   y = rnorm(1000),
+#'   z = rnorm(1000)
+#' )
 #'
-#' p <- ggplot(df, aes(x,y,color = z)) +
-#'   geom_point()
-#' p
-#'
-#' # color steps by default
-#' p + colrr::get_scale_color_fun(df$z)
-#'
-#' # back to normal
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                steps = NULL)
-#'
-#' # set number of steps
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                steps = 12)
-#'
-#' # set steps exactly
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                steps = c(-2.5,-2,0,1))
-#'
-#' # other palette
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colorRamps::blue2red(n = 50))
-#'
-#'
-#'
-#' # color vecor not z-scored
-#' # colpal_info <- col_pal()
-#' df$z <- runif(1000, max = 9)
-#' p <- ggplot(df, aes(x,y,color = z)) +
+#' p <- ggplot(df, aes(x, y, colour = z)) +
 #'   geom_point()
 #'
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("spectral", direction = -1))
+#' # Automatically selected binned scale
+#' p + get_scale_color_fun(df$z)
 #'
-#' # spectral color palette from rcolorbrewer
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = rev(RColorBrewer::brewer.pal(11, "Spectral")))
+#' # Continuous colour scale
+#' p + get_scale_color_fun(df$z, steps = NULL)
 #'
-#' # rainbow palette
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = grDevices::rainbow(n = 50),
-#'                                steps = 10)
-#' # jet palette
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("jet"),
-#'                                steps = NULL)
+#' # Approximately eight numeric breaks
+#' p + get_scale_color_fun(df$z, steps = 8)
 #'
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("jetColors"),
-#'                                steps = NULL)
+#' # Explicit internal breaks
+#' p + get_scale_color_fun(df$z, steps = c(-2, -1, 0, 1, 2))
 #'
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("spectral", direction = -1),
-#'                                steps = NULL)
+#' # Four equal-frequency bins
+#' p + get_scale_color_fun(df$z, steps = "..quartiles..")
 #'
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("spectral", direction = -1),
-#'                                steps = 8)
+#' # Ten equal-frequency bins
+#' p + get_scale_color_fun(df$z, steps = "..deciles..")
 #'
-#' # quantile limits: when cutting the color value range to any percentile, add this info to the color legend
-#' df$z <- scales::squish(df$z, range = c(quantile(df$z, 0.2), quantile(df$z, 0.8)))
-#' max(df$z)
-#' min(df$z)
-#' p <- ggplot(df, aes(x,y,color = z)) +
-#'   geom_point()
+#' # Arbitrary number of equal-frequency bins
+#' p + get_scale_color_fun(df$z, steps = "..12tiles..")
 #'
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("spectral", direction = -1),
-#'                                qmin = 0.2,
-#'                                qmax = 0.8)
+#' # Alternative palette
+#' p + get_scale_color_fun(
+#'   df$z,
+#'   steps = "..quintiles..",
+#'   palette = rev(RColorBrewer::brewer.pal(11, "Spectral"))
+#' )
 #'
-#' # upper and lower limit missing yet, here
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("spectral", direction = -1),
-#'                                qmin = 0.2,
-#'                                qmax = 0.8,
-#'                                steps = NULL)
-#'
-#' p + colrr::get_scale_color_fun(df$z,
-#'                                palette = colrr::col_pal("spectral", direction = -1),
-#'                                qmin = 0.2,
-#'                                qmax = 0.8,
-#'                                steps = 10)
+#' # Fill scale
+#' ggplot(df, aes(x, y, fill = z)) +
+#'   geom_raster() +
+#'   get_scale_fill_fun(df$z, steps = "..quartiles..")
 get_scale_fun <- function(values,
                           zscored = NULL,
                           steps = "..auto..",
@@ -161,7 +162,7 @@ get_scale_fun <- function(values,
     qmin <- qmin/100
   }
 
-  sclfeat <- get_features(
+  sclfeat <- get_scale_features(
     values = values,
     scale_min = scale_min,
     scale_max = scale_max,
@@ -181,14 +182,65 @@ get_scale_fun <- function(values,
     names(limits) <- format(limits, nsmall = max(brathering::get_decimal_places(steps)))
   }
 
+  # if (center_zero) {
+  #   values <- c(0, zero_pos, 1)
+  # } else {
+  #   if (is.null(steps)) {
+  #     values <- scales::rescale(c(sclfeat[["min"]], sclfeat[["mid"]], sclfeat[["max"]]))
+  #   } else {
+  #     values <- scales::rescale(steps)
+  #     #values <- setNames(seq(0.2,0.8,0.2), steps)
+  #   }
+  # }
+
+  palette_values <- NULL
+
   if (center_zero) {
-    values <- c(0, zero_pos, 1)
+    palette_values <- c(0, zero_pos, 1)
+
+  } else if (is.null(steps)) {
+    # Continuous scale
+    palette_values <- scales::rescale(
+      c(sclfeat[["min"]], sclfeat[["mid"]], sclfeat[["max"]]),
+      from = limits
+    )
+
   } else {
-    if (is.null(steps)) {
-      values <- scales::rescale(c(sclfeat[["min"]], sclfeat[["mid"]], sclfeat[["max"]]))
+    # Remove breaks equal to or outside the limits
+    steps <- steps[
+      is.finite(steps) &
+        steps > limits[1] &
+        steps < limits[2]
+    ]
+
+    boundaries <- c(limits[1], steps, limits[2])
+
+    # ggplot performs binning in transformed scale space
+    transformed_boundaries <- if (trans_log) {
+      log10(boundaries)
     } else {
-      values <- scales::rescale(steps)
+      boundaries
     }
+
+    transformed_limits <- range(transformed_boundaries)
+
+    # One palette position for each bin
+    bin_midpoints <- (
+      head(transformed_boundaries, -1L) +
+        tail(transformed_boundaries, -1L)
+    ) / 2
+
+    palette_values <- scales::rescale(
+      bin_midpoints,
+      from = transformed_limits
+    )
+
+    n_bins <- length(bin_midpoints)
+
+    # Sample exactly one evenly distributed colour per bin
+    palette <- scales::colour_ramp(palette)(
+      seq(0, 1, length.out = n_bins)
+    )
   }
 
 
@@ -232,7 +284,7 @@ get_scale_fun <- function(values,
       # labels, breaks, limits still a bit mixed up with naming etc, but seems to work
       scale_obj <-
         scalefun(colors = palette,
-                 values = values,
+                 values = palette_values,
                  nice.breaks = F,
                  breaks = c(sclfeat[["min"]], scllabs[["mids"]], sclfeat[["max"]]), # manually add limits as breaks
                  limits = limits, # limit must be he same as outer breaks
@@ -243,7 +295,7 @@ get_scale_fun <- function(values,
 
       scale_obj <-
         scalefun(colors = palette,
-                 values = values,
+                 values = palette_values,
                  breaks = steps,
                  #labels = format(steps, nsmall = decimals), # done with name of steps
                  limits = limits,
@@ -332,10 +384,10 @@ get_scale_fill_fun <- function(values,
 
 }
 
-get_features <- function(values,
-                         scale_min = NULL,
-                         scale_max = NULL,
-                         zscored = NULL) {
+get_scale_features <- function(values,
+                               scale_min = NULL,
+                               scale_max = NULL,
+                               zscored = NULL) {
 
 
   if (is.null(zscored)) {
@@ -366,7 +418,8 @@ get_features <- function(values,
     max = scale_max,
     mid = scale_mid,
     min = scale_min,
-    uniques = stats::na.omit(sort(unique(values)))
+    uniques = stats::na.omit(sort(unique(values))),
+    values = values
   ))
 }
 
@@ -409,9 +462,14 @@ make_steps <- function(steps = "..auto..",
   decimals <- sclfeat[["decimals"]]
   zscored <- sclfeat[["zscored"]]
 
-
   steps <- sort(unique(steps))
+
+  if (grepl("tiles", steps[1], ignore.case = T)) {
+    steps <- resolve_steps(steps = steps[1], values = sclfeat[["values"]])
+  }
+
   if (length(steps) == 1) {
+
     if (zscored) {
 
       if (steps == "..auto..") {
@@ -545,4 +603,46 @@ make_zscore_breaks <- function(min_x, max_x, n_breaks) {
   breaks <- c(neg_breaks, pos_breaks[-1])
 
   return(breaks)
+}
+
+resolve_steps <- function(steps, values, na.rm = TRUE) {
+  if (
+    !is.character(steps) ||
+    length(steps) != 1L ||
+    is.na(steps)
+  ) {
+    return("..auto..")
+  }
+
+  step_name <- gsub("[^[:alpha:]]", "", tolower(steps))
+
+  divisions <- switch(
+    step_name,
+    tertiles  = 3L,
+    terciles  = 3L,
+    quartiles = 4L,
+    quintiles = 5L,
+    sextiles  = 6L,
+    septiles  = 7L,
+    octiles   = 8L,
+    noniles   = 9L,
+    deciles   = 10L,
+    quantiles = 10L,
+    NULL
+  )
+
+  # Also supports forms such as "..6tiles..", "..8tiles..", etc.
+  if (is.null(divisions) && grepl("^[2-9][0-9]*tiles$", steps)) {
+    divisions <- as.integer(sub("^([0-9]+)tiles$", "\\1", steps))
+  }
+
+  if (is.null(divisions)) {
+    return("..auto..")
+  }
+
+  stats::quantile(
+    values,
+    probs = seq_len(divisions - 1L) / divisions,
+    na.rm = na.rm
+  )
 }

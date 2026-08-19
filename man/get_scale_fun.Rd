@@ -4,7 +4,7 @@
 \alias{get_scale_fun}
 \alias{get_scale_color_fun}
 \alias{get_scale_fill_fun}
-\title{Make a continuous fill/color scale for ggplot}
+\title{Create a continuous or binned ggplot2 colour scale}
 \usage{
 get_scale_fun(
   values,
@@ -62,133 +62,134 @@ get_scale_fill_fun(
 )
 }
 \arguments{
-\item{values}{vector of numeric values}
+\item{values}{Numeric vector used to determine the scale limits, breaks,
+quantiles, and z-score status. Missing and non-finite values are ignored
+where appropriate.}
 
-\item{zscored}{are values z-scored? if NULL, evaluated within function}
+\item{zscored}{Logical indicating whether `values` are z-scored. If `NULL`,
+this is determined automatically.}
 
-\item{steps}{NULL for colorbar, a number for number of steps or a vector or
-..auto.. for decision based on zscored etc; when steps_nice = T it
-influences number of steps}
+\item{steps}{Controls whether and how the scale is binned. One of:
+\itemize{
+  \item `NULL` for a continuous colour bar.
+  \item A single number giving the approximate number of breaks.
+  \item A numeric vector giving the exact internal break positions.
+  \item `"..auto.."` to choose breaks automatically.
+  \item A named n-tile specification: `"..tertiles.."`,
+    `"..terciles.."`, `"..quartiles.."`, `"..quintiles.."`,
+    `"..sextiles.."`, `"..septiles.."`, `"..octiles.."`,
+    `"..noniles.."`, `"..deciles.."`, or `"..quantiles.."`.
+  \item A numeric n-tile specification such as `"..6tiles.."` or
+    `"..12tiles.."`.
+}}
 
-\item{legendbreaks}{vector of breaks}
+\item{legendbreaks}{Break positions for a continuous colour-bar legend.
+Use `"..auto.."` for ggplot2 defaults, `"minmidmax"` for the scale
+minimum, midpoint, and maximum, a single number for evenly spaced
+breaks, or a numeric vector for explicit breaks.}
 
-\item{legendlabels}{vector of labels}
+\item{legendlabels}{Labels for `legendbreaks`. Use `"..auto.."` for
+ggplot2 defaults. When supplied explicitly, the number of labels should
+equal the number of breaks.}
 
-\item{palette}{to color arg of ggplot2::scale_fill/color_gradientn or
-ggplot2::scale_fill/color_stepsn}
+\item{palette}{Character vector of colours passed to
+[ggplot2::scale_fill_gradientn()], [ggplot2::scale_colour_gradientn()],
+[ggplot2::scale_fill_stepsn()], or
+[ggplot2::scale_colour_stepsn()].}
 
-\item{steps_nice}{to nice.breaks in ggplot2::scale_fill/color_stepsn}
+\item{steps_nice}{Logical. If `TRUE`, automatically generated numeric
+breaks are adjusted to visually convenient values. This has no effect
+on explicit break vectors or n-tile breaks.}
 
-\item{type}{fill or color type to return}
+\item{type}{Aesthetic for which the scale is created: `"fill"` or
+`"color"`.}
 
-\item{col_na}{color for NA values}
+\item{col_na}{Colour assigned to missing values.}
 
-\item{qmin}{adjust legend by percentile cutoff at lower end}
+\item{qmin, qmax}{Lower and upper quantiles represented by the supplied
+data limits. Values may be given as proportions between 0 and 1 or as
+percentages. These arguments affect the displayed limit labels.}
 
-\item{qmax}{adjust legend by percentile cutoff at upper end}
+\item{scale_min, scale_max}{Optional numeric scale limits. If `NULL`, they
+are calculated from the finite values in `values`.}
 
-\item{scale_max}{formatted (e.g. rounded) max of values; if NULL, calculated
-within function}
+\item{trans_log}{Logical. If `TRUE`, apply a base-10 logarithmic colour
+transformation. All finite values and scale limits must then be
+positive.}
 
-\item{scale_min}{see max}
+\item{center_zero}{Logical. If `TRUE`, position the centre of the palette
+at zero. This is primarily intended for diverging continuous scales and
+cannot be combined meaningfully with a logarithmic transformation.}
 
-\item{trans_log}{log transform colorscale?}
+\item{...}{Additional arguments reserved for scale customization.}
 }
 \value{
-ggplot scale object
+A ggplot2 continuous or binned colour-scale object.
 }
 \description{
-Make nice default color steps.
+Creates a continuous gradient or a binned colour scale for the `fill` or
+`colour` aesthetic. Breaks can be calculated automatically, supplied
+explicitly, or derived from quantiles such as quartiles, quintiles, or
+deciles.
+}
+\details{
+Named n-tile specifications use empirical quantiles as internal bin
+boundaries. For example, `steps = "..quartiles.."` creates breaks at
+probabilities 0.25, 0.50, and 0.75, producing four bins.
+
+N-tile bins contain approximately equal numbers of observations, but their
+numeric widths may differ. Colours are sampled evenly from `palette` and
+positioned at the midpoint of each bin. Consequently, each bin receives
+an evenly spaced colour from the palette regardless of its width in data
+space.
+
+Repeated values can produce duplicate quantiles. Duplicate boundaries are
+removed, so data with many ties may produce fewer than the requested
+number of bins.
 }
 \examples{
 library(ggplot2)
-library(colrr)
 
-df <- data.frame(x = rnorm(1000),
-                 y = rnorm(1000),
-                 z = rnorm(1000))
+set.seed(1)
+df <- data.frame(
+  x = rnorm(1000),
+  y = rnorm(1000),
+  z = rnorm(1000)
+)
 
-p <- ggplot(df, aes(x,y,color = z)) +
-  geom_point()
-p
-
-# color steps by default
-p + colrr::get_scale_color_fun(df$z)
-
-# back to normal
-p + colrr::get_scale_color_fun(df$z,
-                               steps = NULL)
-
-# set number of steps
-p + colrr::get_scale_color_fun(df$z,
-                               steps = 12)
-
-# set steps exactly
-p + colrr::get_scale_color_fun(df$z,
-                               steps = c(-2.5,-2,0,1))
-
-# other palette
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colorRamps::blue2red(n = 50))
-
-
-
-# color vecor not z-scored
-# colpal_info <- col_pal()
-df$z <- runif(1000, max = 9)
-p <- ggplot(df, aes(x,y,color = z)) +
+p <- ggplot(df, aes(x, y, colour = z)) +
   geom_point()
 
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("spectral", direction = -1))
+# Automatically selected binned scale
+p + get_scale_color_fun(df$z)
 
-# spectral color palette from rcolorbrewer
-p + colrr::get_scale_color_fun(df$z,
-                               palette = rev(RColorBrewer::brewer.pal(11, "Spectral")))
+# Continuous colour scale
+p + get_scale_color_fun(df$z, steps = NULL)
 
-# rainbow palette
-p + colrr::get_scale_color_fun(df$z,
-                               palette = grDevices::rainbow(n = 50),
-                               steps = 10)
-# jet palette
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("jet"),
-                               steps = NULL)
+# Approximately eight numeric breaks
+p + get_scale_color_fun(df$z, steps = 8)
 
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("jetColors"),
-                               steps = NULL)
+# Explicit internal breaks
+p + get_scale_color_fun(df$z, steps = c(-2, -1, 0, 1, 2))
 
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("spectral", direction = -1),
-                               steps = NULL)
+# Four equal-frequency bins
+p + get_scale_color_fun(df$z, steps = "..quartiles..")
 
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("spectral", direction = -1),
-                               steps = 8)
+# Ten equal-frequency bins
+p + get_scale_color_fun(df$z, steps = "..deciles..")
 
-# quantile limits: when cutting the color value range to any percentile, add this info to the color legend
-df$z <- scales::squish(df$z, range = c(quantile(df$z, 0.2), quantile(df$z, 0.8)))
-max(df$z)
-min(df$z)
-p <- ggplot(df, aes(x,y,color = z)) +
-  geom_point()
+# Arbitrary number of equal-frequency bins
+p + get_scale_color_fun(df$z, steps = "..12tiles..")
 
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("spectral", direction = -1),
-                               qmin = 0.2,
-                               qmax = 0.8)
+# Alternative palette
+p + get_scale_color_fun(
+  df$z,
+  steps = "..quintiles..",
+  palette = rev(RColorBrewer::brewer.pal(11, "Spectral"))
+)
 
-# upper and lower limit missing yet, here
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("spectral", direction = -1),
-                               qmin = 0.2,
-                               qmax = 0.8,
-                               steps = NULL)
-
-p + colrr::get_scale_color_fun(df$z,
-                               palette = colrr::col_pal("spectral", direction = -1),
-                               qmin = 0.2,
-                               qmax = 0.8,
-                               steps = 10)
+# Fill scale
+ggplot(df, aes(x, y, fill = z)) +
+  geom_raster() +
+  get_scale_fill_fun(df$z, steps = "..quartiles..")
 }
