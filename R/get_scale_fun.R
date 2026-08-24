@@ -233,17 +233,39 @@ get_scale_fun <- function(values,
         tail(transformed_boundaries, -1L)
     ) / 2
 
-    palette_values <- scales::rescale(
+    # palette_values <- scales::rescale(
+    #   bin_midpoints,
+    #   from = transformed_limits
+    # )
+    #
+    # n_bins <- length(bin_midpoints)
+    #
+    # # Sample exactly one evenly distributed colour per bin
+    # palette <- scales::colour_ramp(palette)(
+    #   seq(0, 1, length.out = n_bins)
+    # )
+
+    bin_colors <- scales::colour_ramp(palette)(
+      seq(0, 1, length.out = length(bin_midpoints))
+    )
+
+    midpoint_values <- scales::rescale(
       bin_midpoints,
       from = transformed_limits
     )
 
-    n_bins <- length(bin_midpoints)
-
-    # Sample exactly one evenly distributed colour per bin
-    palette <- scales::colour_ramp(palette)(
-      seq(0, 1, length.out = n_bins)
+    palette <- c(
+      bin_colors[1],
+      bin_colors,
+      bin_colors[length(bin_colors)]
     )
+
+    palette_values <- c(
+      0,
+      midpoint_values,
+      1
+    )
+
   }
 
 
@@ -404,12 +426,12 @@ get_scale_features <- function(values,
   decimals <- brathering::decimals_adaptive(values)
 
   if (is.null(scale_max)) {
-    # values[which(is.finite(values))]
-    scale_max <- as.numeric(format(brathering::floor2(max(values[which(is.finite(values))], na.rm = T), decimals),
+    # ceiling2 and floor2 appropriate?
+    scale_max <- as.numeric(format(brathering::ceiling2(max(values[which(is.finite(values))], na.rm = T), decimals),
                                    nsmall = decimals))
   }
   if (is.null(scale_min)) {
-    scale_min <- as.numeric(format(brathering::ceiling2(min(values[which(is.finite(values))], na.rm = T), decimals),
+    scale_min <- as.numeric(format(brathering::floor2(min(values[which(is.finite(values))], na.rm = T), decimals),
                                    nsmall = decimals))
   }
   scale_mid <- ifelse(zscored, 0, as.numeric(format(round(scale_min + ((scale_max - scale_min) / 2), decimals),
@@ -646,9 +668,16 @@ resolve_steps <- function(steps, values, na.rm = TRUE) {
     return("..auto..")
   }
 
-  stats::quantile(
+  steps <- stats::quantile(
     values,
     probs = seq_len(divisions - 1L) / divisions,
     na.rm = na.rm
   )
+
+  if (length(unique(steps)) == 1) {
+    message("only one colorstep derived: ", unique(steps), ". switch to '..auto..'")
+    steps <- "..auto.."
+  }
+
+  return(steps)
 }
