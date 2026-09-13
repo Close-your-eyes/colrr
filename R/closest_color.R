@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-#' closest_color(hex =  rainbow(10))
+#' colrr::closest_color(hex =  rainbow(10))
 closest_color <- function(hex, n = 1, print = T) {
   colrr:::.ensure_package("farver")
 

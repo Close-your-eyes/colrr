@@ -2,12 +2,27 @@
 % Please edit documentation in R/order_colors.R
 \name{order_colors}
 \alias{order_colors}
-\title{Title}
+\title{Order colors by similarity}
 \usage{
 order_colors(x, method = c("TSP", "hclust", "path"))
 }
+\arguments{
+\item{x}{A character vector of R color specifications, or a numeric color
+matrix with color channels in rows and colors in columns, as returned by
+[grDevices::col2rgb()].}
+
+\item{method}{Character scalar specifying the ordering algorithm:
+`"TSP"` solves a traveling salesperson problem using the suggested
+\pkg{TSP} package; `"hclust"` uses average-linkage hierarchical
+clustering; and `"path"` uses a perceptual color path.}
+}
+\value{
+An integer vector giving the permutation of the colors in `x`.
+}
 \description{
-Title
+Computes an ordering of colors so that visually similar colors are placed
+near one another. Colors can be ordered by solving a traveling salesperson
+problem, hierarchical clustering, or a perceptual nearest-path method.
 }
 \examples{
 rcolors <- unique(grDevices::colors())

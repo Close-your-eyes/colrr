@@ -12,12 +12,12 @@
 hex_to_grey <- function(hex,
                         out = c("grey", "bw"),
                         bw_thresh = 0.5,
-                        grey_algo = c(3,2,1)) {
+                        grey_algo = c(3,2)) {
   colrr:::.ensure_package("farver")
 
   out <- rlang::arg_match(out)
   grey_algo <- as.character(grey_algo)
-  grey_algo <- rlang::arg_match(grey_algo, values = c("3", "2", "1"))
+  grey_algo <- rlang::arg_match(grey_algo, values = c("3", "2"))
 
   if (out == "bw") {
     rgb <- grDevices::col2rgb(hex) / 255
@@ -32,7 +32,7 @@ hex_to_grey <- function(hex,
 
   if (out == "grey") {
     if (grey_algo == 1) {
-      out_col <- grDevices::gray(grDevices::col2gray(cols))
+      #out_col <- grDevices::gray(grDevices::col2gray(cols))
     } else if (grey_algo == 2) {
       rgb <- grDevices::col2rgb(hex) / 255
       # perceptual luminance

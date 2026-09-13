@@ -1,3 +1,25 @@
+#' Calculate the perceptual lightness of a color
+#'
+#' Converts an sRGB color to its CIE L* perceptual lightness value. The result
+#' ranges approximately from 0 for black to 100 for white.
+#'
+#' @param col Either a single color specified by an R color name or hexadecimal
+#'   string, or a numeric vector of length three containing red, green, and blue
+#'   channel values on a scale from 0 to 255.
+#'
+#' @returns A numeric scalar containing the color's CIE L* lightness.
+#'
+#' @references
+#' The conversion follows the sRGB relative-luminance formula described in
+#' [W3C Web Content Accessibility Guidelines](https://www.w3.org/TR/WCAG21/#dfn-relative-luminance).
+#'
+#' @export
+#'
+#' @examples
+#' get_lum("black")
+#' get_lum("white")
+#' get_lum("#336699")
+#' get_lum(c(51, 102, 153))
 get_lum <- function(col) {
   #https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
 

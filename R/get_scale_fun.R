@@ -226,8 +226,8 @@ get_scale_fun <- function(values,
 
     # One palette position for each bin
     bin_midpoints <- (
-      head(transformed_boundaries, -1L) +
-        tail(transformed_boundaries, -1L)
+      utils::head(transformed_boundaries, -1L) +
+        utils::tail(transformed_boundaries, -1L)
     ) / 2
 
     # palette_values <- scales::rescale(

@@ -4,12 +4,7 @@
 \alias{hex_to_grey}
 \title{Hey color to grey scale}
 \usage{
-hex_to_grey(
-  hex,
-  out = c("grey", "bw"),
-  bw_thresh = 0.5,
-  grey_algo = c(3, 2, 1)
-)
+hex_to_grey(hex, out = c("grey", "bw"), bw_thresh = 0.5, grey_algo = c(3, 2))
 }
 \arguments{
 \item{hex}{hex color vector}

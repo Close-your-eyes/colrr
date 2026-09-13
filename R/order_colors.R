@@ -1,8 +1,19 @@
-#' Title
+#' Order colors by similarity
 #'
-#' @param x
+#' Computes an ordering of colors so that visually similar colors are placed
+#' near one another. Colors can be ordered by solving a traveling salesperson
+#' problem, hierarchical clustering, or a perceptual nearest-path method.
 #'
-#' @returns
+#' @param x A character vector of R color specifications, or a numeric color
+#'   matrix with color channels in rows and colors in columns, as returned by
+#'   [grDevices::col2rgb()].
+#' @param method Character scalar specifying the ordering algorithm:
+#'   `"TSP"` solves a traveling salesperson problem using the suggested
+#'   \pkg{TSP} package; `"hclust"` uses average-linkage hierarchical
+#'   clustering; and `"path"` uses a perceptual color path.
+#'
+#' @return An integer vector giving the permutation of the colors in `x`.
+#'
 #' @export
 #'
 #' @examples
@@ -11,7 +22,11 @@
 #' rcolorshex <- grDevices::rgb(rcolorsrgb[1, ], rcolorsrgb[2, ], rcolorsrgb[3, ], maxColorValue = 255, alpha = T)
 #' out <- order_colors(rcolorsrgb)
 #' scales::show_col(rcolors[out], labels = F)
-order_colors <- function(x, method = c("TSP", "hclust", "path")) {
+order_colors <- function(x, method = c(
+  "TSP",
+  "hclust",
+  "path"
+)) {
 
 
   method <- rlang::arg_match(method)
@@ -36,7 +51,7 @@ order_colors <- function(x, method = c("TSP", "hclust", "path")) {
 
   if (method == "hclust") {
     d <- stats::dist(t(x))
-    fit <- hclust(d, method = "average")
+    fit <- stats::hclust(d, method = "average")
     return(fit$order)
   }
 
@@ -73,7 +88,7 @@ order_colors_perceptual <- function(colors) {
     path <- start
 
     while (length(remaining)) {
-      current <- tail(path, 1)
+      current <- utils::tail(path, 1)
       next_color <- remaining[
         which.min(distances[current, remaining])
       ]

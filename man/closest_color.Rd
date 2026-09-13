@@ -20,5 +20,5 @@ color name
 Find most similar built-in R color
 }
 \examples{
-closest_color(hex =  rainbow(10))
+colrr::closest_color(hex =  rainbow(10))
 }
