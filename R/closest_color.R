@@ -10,6 +10,7 @@
 #' @examples
 #' closest_color(hex =  rainbow(10))
 closest_color <- function(hex, n = 1, print = T) {
+  colrr:::.ensure_package("farver")
 
   # target_rgb <- as.vector(grDevices::col2rgb(hex))
   # all_colors <- grDevices::colors()

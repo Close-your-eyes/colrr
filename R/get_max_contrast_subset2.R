@@ -19,6 +19,7 @@ get_max_contrast_subset2 <- function(cols,
                                      include = NULL,
                                      exclude = NULL,
                                      topn = 1) {
+  colrr:::.ensure_package("igraph")
 
   if (is.null(contrast_matrix)) {
     contrast_matrix <- contrast_ratio(cols, cols)

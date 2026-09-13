@@ -38,6 +38,7 @@ theme_material <- function(base_size = 12,
                            white = F,
                            legend_tight = F,
                            ...) {
+  colrr:::.ensure_package("ggplot2")
 
   style <- rlang::arg_match(style)
 
@@ -150,6 +151,7 @@ theme_material <- function(base_size = 12,
 #' # larger bar by default
 #' gplot  + colrr::theme_material() + guides_default(colorbar = T)
 guides_default <- function(colorbar = F, ...) {
+  colrr:::.ensure_packages(c("ggplot2", "ggtext"))
   # fill and color !!!
   ggplot2::guides(
     fill = if (colorbar) {

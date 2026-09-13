@@ -19,6 +19,7 @@ scale_color_spectral <- function(colors = colrr::col_pal("RColorBrewer::Spectral
                                  na.value = "grey50",
                                  guide = "colorbar",
                                  ...) {
+    colrr:::.ensure_package("ggplot2")
     if (is.null(values)) {
         values <- seq(0, 1, length.out = length(colors))
     }
@@ -53,6 +54,7 @@ scale_fill_spectral <- function(colors = colrr::col_pal("RColorBrewer::Spectral"
                                 na.value = "grey50",
                                 guide = "colorbar",
                                 ...) {
+    colrr:::.ensure_package("ggplot2")
 
     if (is.null(values)) {
         values <- seq(0, 1, length.out = length(colors))
@@ -83,6 +85,7 @@ scale_color_custom <- function(colors = colrr::col_pal("custom"),
                                name = ggplot2::waiver(),
                                na.value = "grey50",
                                ...) {
+    colrr:::.ensure_package("ggplot2")
 
     ggplot2::scale_color_manual(
         values = colors,
@@ -107,6 +110,7 @@ scale_fill_custom <- function(colors = colrr::col_pal("custom"),
                               name = ggplot2::waiver(),
                               na.value = "grey50",
                               ...) {
+    colrr:::.ensure_package("ggplot2")
 
     ggplot2::scale_fill_manual(
         values = colors,

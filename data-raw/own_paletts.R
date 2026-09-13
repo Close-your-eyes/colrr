@@ -258,11 +258,21 @@ customx <- c(
   "grey65"
 )
 
+# color groups
+custom5 <- c("navy","tan4", "darkorchid4",
+  "mediumpurple1",  "plum1",
+  "turquoise3","cadetblue1", "cornflowerblue",
+  "darkorange","tomato3",
+  "lightgreen", "forestgreen", "olivedrab3",
+  "darkgoldenrod1", "khaki1",
+  "grey65")
+
 usethis::use_data(
   custom,
   custom2,
   custom3,
   custom4,
+  custom5,
   custom_light,
   material,
   cold,

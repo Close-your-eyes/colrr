@@ -13,6 +13,7 @@ hex_to_grey <- function(hex,
                         out = c("grey", "bw"),
                         bw_thresh = 0.5,
                         grey_algo = c(3,2,1)) {
+  colrr:::.ensure_package("farver")
 
   out <- rlang::arg_match(out)
   grey_algo <- as.character(grey_algo)
@@ -51,5 +52,4 @@ hex_to_grey <- function(hex,
   }
    return(out_col)
 }
-
 

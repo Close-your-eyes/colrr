@@ -1,7 +1,7 @@
 Package: colrr
 Type: Package
 Title: Color related functions
-Version: 0.1.3
+Version: 0.1.5
 Description: Custom color palettes and a wrapper around paletteer.
 License: AGPL (>= 3)
 Encoding: UTF-8
@@ -15,15 +15,22 @@ Authors@R:
 Imports: 
     paletteer,
     prismatic,
-    ggplot2,
-    ggtext,
-    igraph,
     purrr,
     dplyr,
     rlang,
     scales,
     grDevices,
     methods
+Suggests:
+    brathering,
+    farver,
+    ggplot2,
+    ggtext,
+    igraph,
+    pak,
+    RColorBrewer,
+    reticulate,
+    TSP
 Depends: 
     R (>= 3.5)
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

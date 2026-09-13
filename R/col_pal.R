@@ -40,10 +40,6 @@ col_pal <- function(name = NULL,
                     shuffle = F,
                     seed = 42) {
 
-  if (!requireNamespace("paletteer", quietly = T)) {
-    utils::install.packages("paletteer")
-  }
-
   paletteers <-
     dplyr::bind_rows(dplyr::mutate(paletteer::palettes_c_names, type2 = "continuous"),
                      dplyr::mutate(paletteer::palettes_d_names, type2 = "discrete")) |>
@@ -121,6 +117,9 @@ col_pal <- function(name = NULL,
     }
 
     if (pal_select$type2 == "discrete") {
+      if (identical(pal_select$package, "RColorBrewer")) {
+        colrr:::.ensure_package("RColorBrewer")
+      }
       type <- "discrete"
       if (is.null(n) || n == 0) {
         n <- pal_select$length

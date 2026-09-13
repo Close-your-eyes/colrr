@@ -136,10 +136,7 @@ get_scale_fun <- function(values,
                           trans_log = F,
                           center_zero = F,
                           ...) {
-
-  if (!requireNamespace("brathering", quietly = T)) {
-    pak::pak("Close-your-eyes/brathering")
-  }
+  colrr:::.ensure_packages(c("brathering", "ggplot2"))
 
   #qmin, qmax for featureplot2 from scexpr, for correct limits of steps, steps must be auto or vector
   # min: provided from scexpr featureplot2 but exclude non expressers (=0)
@@ -413,6 +410,7 @@ get_scale_features <- function(values,
                                scale_min = NULL,
                                scale_max = NULL,
                                zscored = NULL) {
+  colrr:::.ensure_package("brathering")
 
 
   if (is.null(zscored)) {
@@ -451,6 +449,7 @@ get_scale_features <- function(values,
 make_breaks_labels <- function(legendbreaks = "..auto..",
                                legendlabels = "..auto..",
                                sclfeat) {
+  colrr:::.ensure_package("ggplot2")
 
   min <- sclfeat[["min"]]
   mid <- sclfeat[["mid"]]
@@ -480,6 +479,7 @@ make_steps <- function(steps = "..auto..",
                        sclfeat,
                        trans_log = F,
                        steps_nice = T) {
+  colrr:::.ensure_package("brathering")
 
   min <- sclfeat[["min"]]
   mid <- sclfeat[["mid"]]
@@ -562,6 +562,7 @@ make_new_limits <- function(qmin = 0,
                             qmax = 1,
                             sclfeat,
                             steps) {
+  colrr:::.ensure_package("brathering")
 
   # min <- sclfeat[["min"]]
   # max <- sclfeat[["max"]]
