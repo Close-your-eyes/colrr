@@ -2,10 +2,29 @@
 % Please edit documentation in R/get_lum.R
 \name{get_lum}
 \alias{get_lum}
-\title{Title}
+\title{Calculate the perceptual lightness of a color}
 \usage{
 get_lum(col)
 }
+\arguments{
+\item{col}{Either a single color specified by an R color name or hexadecimal
+string, or a numeric vector of length three containing red, green, and blue
+channel values on a scale from 0 to 255.}
+}
+\value{
+A numeric scalar containing the color's CIE L* lightness.
+}
 \description{
-Title
+Converts an sRGB color to its CIE L* perceptual lightness value. The result
+ranges approximately from 0 for black to 100 for white.
+}
+\examples{
+get_lum("black")
+get_lum("white")
+get_lum("#336699")
+get_lum(c(51, 102, 153))
+}
+\references{
+The conversion follows the sRGB relative-luminance formula described in
+[W3C Web Content Accessibility Guidelines](https://www.w3.org/TR/WCAG21/#dfn-relative-luminance).
 }

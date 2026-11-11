@@ -147,7 +147,7 @@ get_scale_fun <- function(values,
 
   type <- rlang::arg_match(type)
 
-  if (length(unique(values)) == 1) {
+  if (!is.null(steps) && length(unique(values)) == 1) {
     if (type == "fill") {
       scalefun <- ggplot2::scale_fill_gradientn
     } else {
@@ -171,14 +171,12 @@ get_scale_fun <- function(values,
   limits <- c(sclfeat[["min"]], sclfeat[["max"]])
   zero_pos <- scales::rescale(0, from = limits)
 
-  steps <- make_steps(steps = steps,
-                      sclfeat = sclfeat,
-                      trans_log = trans_log,
-                      steps_nice = steps_nice)
-  names(steps) <- format(steps, nsmall = max(brathering::get_decimal_places(limits))) # just as with limits above: shift all values by one char if there are negative values
-  # check if it is appropriate in all situations
-
   if (!is.null(steps)) {
+    steps <- make_steps(steps = steps,
+                        sclfeat = sclfeat,
+                        trans_log = trans_log,
+                        steps_nice = steps_nice)
+    names(steps) <- format(steps, nsmall = max(brathering::get_decimal_places(limits)))
     names(limits) <- format(limits, nsmall = max(brathering::get_decimal_places(steps)))
   }
 
@@ -195,17 +193,10 @@ get_scale_fun <- function(values,
 
   palette_values <- NULL
 
-  if (center_zero) {
+  if (!is.null(steps) && center_zero) {
     palette_values <- c(0, zero_pos, 1)
 
-  } else if (is.null(steps)) {
-    # Continuous scale
-    palette_values <- scales::rescale(
-      c(sclfeat[["min"]], sclfeat[["mid"]], sclfeat[["max"]]),
-      from = limits
-    )
-
-  } else {
+  } else if (!is.null(steps)) {
     # Remove breaks equal to or outside the limits
     steps <- steps[
       is.finite(steps) &
@@ -279,9 +270,14 @@ get_scale_fun <- function(values,
                                         legendlabels = legendlabels,
                                         sclfeat = sclfeat)
 
+    if (center_zero && !trans_log && limits[1] < 0 && limits[2] > 0) {
+      palette_values <- c(0, zero_pos, 1)
+    }
+
     scale_obj <-
-      scalefun(values = values,
+      scalefun(values = palette_values,
                colors = palette,
+               limits = limits,
                breaks = breaks_labels[["breaks"]],
                labels = breaks_labels[["labels"]],
                na.value = col_na,
